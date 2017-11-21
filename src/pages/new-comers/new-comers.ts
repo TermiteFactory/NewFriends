@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * Generated class for the NewComersPage page.
@@ -14,7 +15,7 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
   templateUrl: 'new-comers.html'
 })
 export class NewComersPage {
-  newcomersByDate: AngularFireList<any>;
+  newcomersByDate: Observable<any[]>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
     this.newcomersByDate = afd.list('/bydate', ref=>ref.orderByChild("date")).valueChanges();
