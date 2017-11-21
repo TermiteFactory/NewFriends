@@ -1,0 +1,7 @@
+
+<ion-list-header>
+  <ion-datetime disabled displayFormat="DDD D MMM YYYY" [ngModel]="newcomersbydate.date"></ion-datetime>
+</ion-list-header>
+<ion-item *ngFor="let person of newcomersbydate.people" (click)="showDetails(person)" detail-push>
+  {{person.name}}
+</ion-item>

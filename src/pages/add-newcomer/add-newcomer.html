@@ -1,0 +1,119 @@
+<!--
+  Generated template for the AddNewcomerPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Add a Friend</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+
+    <ion-item>
+      <ion-label stacked>Name</ion-label>
+      <ion-input type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Came With</ion-label>
+      <ion-input type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Age</ion-label>
+      <ion-select interface="popover">
+        <ion-option value="7-15">7-15</ion-option>
+        <ion-option value="16-23">16-23</ion-option>
+        <ion-option value="24-35">24-35</ion-option>
+        <ion-option value="36-55">36-55</ion-option>
+        <ion-option value="55+">55+</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Phone</ion-label>
+      <ion-input type="tel"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Email</ion-label>
+      <ion-input type="email"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Religion</ion-label>
+      <ion-select interface="popover">
+        <ion-option value="Christian">Christian</ion-option>
+        <ion-option value="Free-Thinker">Free-Thinker</ion-option>
+        <ion-option value="Other Religion">Other Religion</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Purpose for Visit</ion-label>
+      <ion-select interface="popover">
+        <ion-option value="None">None</ion-option>
+        <ion-option value="Finding a Church">Finding a Church</ion-option>
+        <ion-option value="To Know God">To Know God</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Visited Before?</ion-label>
+      <ion-select interface="popover">
+        <ion-option value="First Time">First Time</ion-option>
+        <ion-option value="Another Service">Another Service</ion-option>
+        <ion-option value="Some Time Back">Some Time Back</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-list>
+
+      <ion-item>
+        <ion-label>Learn about Alpha</ion-label>
+        <ion-checkbox [(ngModel)]="alpha"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Learn about Connect Group</ion-label>
+        <ion-checkbox [(ngModel)]="connect"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Learn about Church School or XS</ion-label>
+        <ion-checkbox [(ngModel)]="churchschool"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Learn about YAM</ion-label>
+        <ion-checkbox [(ngModel)]="yam"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Learn about CVL</ion-label>
+        <ion-checkbox [(ngModel)]="cvl"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Speak to a Pastor</ion-label>
+        <ion-checkbox [(ngModel)]="pastor"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Do not Contact Me</ion-label>
+        <ion-checkbox [(ngModel)]="nocontact"></ion-checkbox>
+      </ion-item>
+
+    </ion-list>
+
+    <button ion-button full>Submit</button>
+
+  </ion-list>
+</ion-content>
