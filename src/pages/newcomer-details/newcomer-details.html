@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>{{newcomer.name}}</ion-title>
+    <ion-title>{{( newcomerdetails | async)?.name }}</ion-title>
   </ion-navbar>
 
 </ion-header>

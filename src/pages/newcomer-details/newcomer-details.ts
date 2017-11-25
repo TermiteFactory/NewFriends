@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * Generated class for the NewcomerDetailsPage page.
@@ -14,10 +16,11 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
   templateUrl: 'newcomer-details.html',
 })
 export class NewcomerDetailsPage {
-  newcomer : Object;
+  newcomerdetails: Observable<any>;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
-    this.newcomer = navParams.data.newcomer;
+  constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
+    this.newcomerdetails = afd.object('/bykey/' + navParams.data.newcomerkey).valueChanges();
+    
   }
 
   ionViewDidLoad() {

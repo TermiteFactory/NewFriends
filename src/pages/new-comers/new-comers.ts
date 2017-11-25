@@ -15,10 +15,10 @@ import { Observable } from 'rxjs/Observable';
   templateUrl: 'new-comers.html'
 })
 export class NewComersPage {
-  newcomersByDate: Observable<any[]>;
+  newcomersSummary: Observable<any[]>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
-    this.newcomersByDate = afd.list('/bydate', ref=>ref.orderByChild("date")).valueChanges();
+    this.newcomersSummary = afd.list('/summary', ref=>ref.orderByChild("date")).valueChanges();
   }
 
   addNewcomer() {

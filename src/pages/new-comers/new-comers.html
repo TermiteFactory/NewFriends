@@ -18,6 +18,6 @@
 
 <ion-content padding>
   <ion-list>
-    <matchstick-bydate-newcomers *ngFor="let bydate of newcomersByDate | async | reverse " [newcomersbydate]=bydate></matchstick-bydate-newcomers>
+    <matchstick-bydate-newcomers *ngFor="let person of newcomersSummary | async | reverse | headers" [person]=person></matchstick-bydate-newcomers>
   </ion-list>
 </ion-content>

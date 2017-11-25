@@ -6,10 +6,10 @@ import { NavController, NavParams } from 'ionic-angular';
   templateUrl: 'bydate-newcomers.html'
 })
 export class ByDateNewcomers {
-  @Input() newcomersbydate;
+  @Input() person;
   constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
-  showDetails(person) {
-    this.navCtrl.push("NewcomerDetailsPage", { newcomer: person });
+  showDetails() {
+    this.navCtrl.push("NewcomerDetailsPage", { newcomerkey: this.person.details_key });
   }
 }
