@@ -39,26 +39,28 @@ export class AddNewcomerPage {
   myAfd: AngularFireDatabase; 
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
+    this.data = {
+      dateVisited : new Date().toISOString().substring(0,10),
+      name : "",
+      cameWith : "",
+      age : "",
+      phone : "",
+      email : "",
+      religion : "",
+      purpose : "",
+      visitedBefore : "",
+      tag_alpha : false,
+      tag_connect : false,
+      tag_churchschool : false,
+      tag_yam : false,
+      tag_cvl : false,
+      tag_pastor : false,
+      tag_nocontact : false 
+    };
+    
     this.myAfd = afd;
     this.newcomerRef = afd.list('/bykey');
     this.summaryRef = afd.list('/summary')
-
-    this.data.dateVisited = new Date().toDateString();
-    this.data.name = "";
-    this.data.cameWith = "";
-    this.data.age = "";
-    this.data.phone = "";
-    this.data.email = "";
-    this.data.religion = "";
-    this.data.purpose = "";
-    this.data.visitedBefore = "";
-    this.data.tag_alpha = false;
-    this.data.tag_connect = false;
-    this.data.tag_churchschool = false;
-    this.data.tag_yam = false;
-    this.data.tag_cvl = false;
-    this.data.tag_pastor = false;
-    this.data.tag_nocontact = false;
   }
 
   ionViewDidLoad() {
