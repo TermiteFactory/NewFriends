@@ -16,7 +16,24 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 })
 export class AddNewcomerPage {
 
-  data : Object; 
+  data : { 
+    dateVisited: String,
+    name : String
+    cameWith : String
+    age: String
+    phone: String
+    email: String
+    religion: String
+    purpose: String
+    visitedBefore: String
+    tag_alpha: boolean,
+    tag_connect: boolean,
+    tag_churchschool: boolean,
+    tag_yam: boolean,
+    tag_cvl: boolean,
+    tag_pastor: boolean,
+    tag_nocontact: boolean }; 
+
   newcomerRef : AngularFireList<any>;
   summaryRef : AngularFireList<any>;
   myAfd: AngularFireDatabase; 
@@ -26,23 +43,22 @@ export class AddNewcomerPage {
     this.newcomerRef = afd.list('/bykey');
     this.summaryRef = afd.list('/summary')
 
-    this.data = { 
-      dateVisited: new Date().toISOString(),
-      name : "",
-      cameWith : "",
-      age: "",
-      phone: "",
-      email: "",
-      religion: "",
-      purpose: "",
-      visitedBefore: "",
-      tag_alpha: false,
-      tag_connect: false,
-      tag_churchschool: false,
-      tag_yam: false,
-      tag_cvl: false,
-      tag_pastor: false,
-      tag_nocontact: false };
+    this.data.dateVisited = new Date().toDateString();
+    this.data.name = "";
+    this.data.cameWith = "";
+    this.data.age = "";
+    this.data.phone = "";
+    this.data.email = "";
+    this.data.religion = "";
+    this.data.purpose = "";
+    this.data.visitedBefore = "";
+    this.data.tag_alpha = false;
+    this.data.tag_connect = false;
+    this.data.tag_churchschool = false;
+    this.data.tag_yam = false;
+    this.data.tag_cvl = false;
+    this.data.tag_pastor = false;
+    this.data.tag_nocontact = false;
   }
 
   ionViewDidLoad() {
