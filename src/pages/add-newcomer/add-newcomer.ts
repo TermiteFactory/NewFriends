@@ -39,8 +39,23 @@ export class AddNewcomerPage {
   myAfd: AngularFireDatabase; 
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
+    let today = new Date();
+    
+    function pad(datenum: Number) {
+      let datestring : String;
+      datestring = datenum.toString();
+      if (datestring.length == 2) {
+        return datestring;
+      }
+      else {
+        return '0' + datestring;
+      }
+    }
+    
+    let todaystring = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate()); 
+
     this.data = {
-      dateVisited : new Date().toISOString().substring(0,10),
+      dateVisited : todaystring,
       name : "",
       cameWith : "",
       age : "",
@@ -79,7 +94,7 @@ export class AddNewcomerPage {
                           tag_pastor: this.data.tag_pastor,
                           tag_nocontact: this.data.tag_nocontact };
 
-    this.summaryRef.push(summary_data);
+    this.summaryRef.push(summary_data).then( () => this.navCtrl.pop());
   }
 
   submit() {
