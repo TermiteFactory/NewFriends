@@ -18,13 +18,15 @@ export class NewComersPage {
   newcomersSummary: Observable<any[]>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
-    this.newcomersSummary = afd.list('/summary', ref=>ref.orderByChild("date")).valueChanges();
+    this.newcomersSummary = afd.list('/summary', ref=>ref.orderByChild("date")).snapshotChanges().map(changes => {
+      return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+    });
   }
 
   addNewcomer() {
     this.navCtrl.push("AddNewcomerPage");
   }
-
+  
   ionViewDidLoad() {
     console.log('ionViewDidLoad NewComersPage');
   }

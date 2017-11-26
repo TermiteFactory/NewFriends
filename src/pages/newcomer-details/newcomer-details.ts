@@ -17,14 +17,57 @@ import { Observable } from 'rxjs/Observable';
 })
 export class NewcomerDetailsPage {
   newcomerdetails: Observable<any>;
+  data : { 
+    dateVisited: String,
+    name : String
+    cameWith : String
+    age: String
+    phone: String
+    email: String
+    religion: String
+    purpose: String
+    visitedBefore: String
+    tag_alpha: boolean,
+    tag_connect: boolean,
+    tag_churchschool: boolean,
+    tag_yam: boolean,
+    tag_cvl: boolean,
+    tag_pastor: boolean,
+    tag_nocontact: boolean } = {
+      dateVisited : "",
+      name : "",
+      cameWith : "",
+      age : "",
+      phone : "",
+      email : "",
+      religion : "",
+      purpose : "",
+      visitedBefore : "",
+      tag_alpha : false,
+      tag_connect : false,
+      tag_churchschool : false,
+      tag_yam : false,
+      tag_cvl : false,
+      tag_pastor : false,
+      tag_nocontact : false 
+    };
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
+
     this.newcomerdetails = afd.object('/bykey/' + navParams.data.newcomerkey).valueChanges();
-    
+    this.newcomerdetails.subscribe(mydata => this.data = mydata );
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad NewcomerDetailsPage');
+  }
+
+  delete() {
+
+  }
+
+  editNewcomer() {
+
   }
 
 }

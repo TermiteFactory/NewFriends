@@ -10,6 +10,7 @@ export class ByDateNewcomers {
   constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
   showDetails() {
-    this.navCtrl.push("NewcomerDetailsPage", { newcomerkey: this.person.details_key });
+    this.navCtrl.push("NewcomerDetailsPage", { newcomerkey: this.person.details_key, 
+                                               summarykey: this.person.key });
   }
 }
