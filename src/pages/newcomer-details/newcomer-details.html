@@ -7,115 +7,28 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>{{( newcomerdetails | async)?.name }}</ion-title>
+    <ion-title> {{data.name}} </ion-title>
     <ion-buttons end>
-        <button ion-button icon-left (click)="editNewcomer()"><ion-icon name="create"></ion-icon>Edit</button>
-      </ion-buttons>
+      <button ion-button icon-left (click)="editNewcomer()">
+        <ion-icon name="create"></ion-icon>Edit Details</button>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
-
-
 <ion-content padding>
-    <ion-list>
-      <ion-item>
-          <ion-label stacked>Visited On</ion-label>
-          <ion-datetime disabled displayFormat="DDD D MMM YYYY" pickerFormat="D MMM YYYY" [(ngModel)]="data.dateVisited"></ion-datetime>
-      </ion-item>
+  <ion-card>
 
-      <ion-item>
-        <ion-label stacked>Came With</ion-label>
-        <ion-input disabled type="text" [(ngModel)]="data.cameWith"></ion-input>
-      </ion-item>
-  
-      <ion-item>
-        <ion-label>Age</ion-label>
-        <ion-select disabled interface="popover" [(ngModel)]="data.age">
-          <ion-option value="7-15">7-15</ion-option>
-          <ion-option value="16-23">16-23</ion-option>
-          <ion-option value="24-35">24-35</ion-option>
-          <ion-option value="36-55">36-55</ion-option>
-          <ion-option value="55+">55+</ion-option>
-        </ion-select>
-      </ion-item>
-  
-      <ion-item>
-        <ion-label stacked>Phone</ion-label>
-        <ion-input disabled type="tel" [(ngModel)]="data.phone"></ion-input>
-      </ion-item>
-  
-      <ion-item>
-        <ion-label stacked>Email</ion-label>
-        <ion-input disabled type="email" [(ngModel)]="data.email"></ion-input>
-      </ion-item>
-  
-      <ion-item>
-        <ion-label>Religion</ion-label>
-        <ion-select disabled interface="popover" [(ngModel)]="data.religion">
-          <ion-option value="Christian">Christian</ion-option>
-          <ion-option value="Free-Thinker">Free-Thinker</ion-option>
-          <ion-option value="Other Religion">Other Religion</ion-option>
-        </ion-select>
-      </ion-item>
-  
-      <ion-item>
-        <ion-label stacked>Purpose for Visit</ion-label>
-        <ion-select disabled interface="popover" [(ngModel)]="data.purpose">
-          <ion-option value="None">None</ion-option>
-          <ion-option value="Finding a Church">Finding a Church</ion-option>
-          <ion-option value="To Know God">To Know God</ion-option>
-        </ion-select>
-      </ion-item>
-  
-      <ion-item>
-        <ion-label stacked>Visited Before?</ion-label>
-        <ion-select disabled interface="popover" [(ngModel)]="data.visitedBefore">
-          <ion-option value="First Time">First Time</ion-option>
-          <ion-option value="Another Service">Another Service</ion-option>
-          <ion-option value="Some Time Back">Some Time Back</ion-option>
-        </ion-select>
-      </ion-item>
-  
+    <ion-card-content>
       <ion-list>
-  
         <ion-item>
-          <ion-label>Learn about Alpha</ion-label>
-          <ion-checkbox disabled [(ngModel)]="data.tag_alpha"></ion-checkbox>
+          <ion-label stacked>Name</ion-label>
+          <ion-input disabled type="text" [ngModel]="data.name"></ion-input>
         </ion-item>
-  
         <ion-item>
-          <ion-label>Learn about Connect Group or Cell Group</ion-label>
-          <ion-checkbox disabled [(ngModel)]="data.tag_connect"></ion-checkbox>
+          <ion-label stacked>Visited On</ion-label>
+          <ion-datetime displayFormat="DDD D MMM YYYY" pickerFormat="D MMM YYYY">{{(newcomerdetails | async)?.dateVisited}}</ion-datetime>
         </ion-item>
-  
-        <ion-item>
-          <ion-label>Learn about Church School or XS</ion-label>
-          <ion-checkbox disabled [(ngModel)]="data.tag_churchschool"></ion-checkbox>
-        </ion-item>
-  
-        <ion-item>
-          <ion-label>Learn about YAM</ion-label>
-          <ion-checkbox disabled [(ngModel)]="data.tag_yam"></ion-checkbox>
-        </ion-item>
-  
-        <ion-item>
-          <ion-label>Learn about CVL</ion-label>
-          <ion-checkbox disabled [(ngModel)]="data.tag_cvl"></ion-checkbox>
-        </ion-item>
-  
-        <ion-item>
-          <ion-label>Speak to a Pastor</ion-label>
-          <ion-checkbox disabled [(ngModel)]="data.tag_pastor"></ion-checkbox>
-        </ion-item>
-  
-        <ion-item>
-          <ion-label>Do not Contact Me</ion-label>
-          <ion-checkbox disabled [(ngModel)]="data.tag_nocontact"></ion-checkbox>
-        </ion-item>
-  
       </ion-list>
-  
-      <button ion-button color="danger" (click)=delete()>Delete</button>
-  
-    </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

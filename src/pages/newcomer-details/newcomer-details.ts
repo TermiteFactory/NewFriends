@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
+import { AngularFireObject } from 'angularfire2/database/interfaces';
 
 /**
  * Generated class for the NewcomerDetailsPage page.
@@ -17,6 +18,7 @@ import { Observable } from 'rxjs/Observable';
 })
 export class NewcomerDetailsPage {
   newcomerdetails: Observable<any>;
+  
   data : { 
     dateVisited: String,
     name : String
@@ -51,23 +53,24 @@ export class NewcomerDetailsPage {
       tag_pastor : false,
       tag_nocontact : false 
     };
+    myNavCtrl: NavController;
+    myNavParams: NavParams;
+    newcomerdetailsRef: AngularFireObject<any>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
-
-    this.newcomerdetails = afd.object('/bykey/' + navParams.data.newcomerkey).valueChanges();
-    this.newcomerdetails.subscribe(mydata => this.data = mydata );
+    this.myNavCtrl = navCtrl;
+    this.myNavParams = navParams;
+    this.newcomerdetailsRef= afd.object('/bykey/' + navParams.data.newcomerkey);
+    this.newcomerdetailsRef.valueChanges().subscribe( mydata => this.data = mydata);
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad NewcomerDetailsPage');
   }
 
-  delete() {
-
-  }
-
   editNewcomer() {
-
+    this.myNavCtrl.push("EditNewcomerPage", { newcomerkey: this.myNavParams.data.newcomerkey, 
+                                              summarykey: this.myNavParams.data.summarykey });
   }
 
 }
