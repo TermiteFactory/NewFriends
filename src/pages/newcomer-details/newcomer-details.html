@@ -22,11 +22,39 @@
       <ion-list>
         <ion-item>
           <ion-label stacked>Name</ion-label>
-          <ion-input disabled type="text" [ngModel]="data.name"></ion-input>
+          <ion-input readonly type="text" [ngModel]="data.name"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Visited On</ion-label>
-          <ion-datetime displayFormat="DDD D MMM YYYY" pickerFormat="D MMM YYYY">{{(newcomerdetails | async)?.dateVisited}}</ion-datetime>
+          <ion-input readonly type="text" [ngModel]="data.dateVisited"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Came With</ion-label>
+          <ion-input readonly type="text" [ngModel]="data.cameWith"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Age</ion-label>
+          <ion-input readonly type="text" [ngModel]="data.age"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Phone</ion-label>
+          <ion-input readonly type="tel" [ngModel]="data.phone"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Email</ion-label>
+          <ion-input readonly type="email" [ngModel]="data.email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Religion</ion-label>
+          <ion-input readonly type="text" [ngModel]="data.religion"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Purpose for Visit</ion-label>
+          <ion-input readonly type="text" [ngModel]="data.purpose"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Visited Before?</ion-label>
+          <ion-input readonly type="text" [ngModel]="data.visitedBefore"></ion-input>
         </ion-item>
       </ion-list>
     </ion-card-content>
