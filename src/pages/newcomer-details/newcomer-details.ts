@@ -17,7 +17,6 @@ import { AngularFireObject } from 'angularfire2/database/interfaces';
   templateUrl: 'newcomer-details.html',
 })
 export class NewcomerDetailsPage {
-  newcomerdetails: Observable<any>;
   
   data : { 
     dateVisited: String,

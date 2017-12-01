@@ -112,8 +112,23 @@ export class EditNewcomerPage {
     );
   }
 
+  addToSummary() {
+    let summary_data = {  date: this.data.dateVisited,
+                          name: this.data.name,
+                          tag_alpha: this.data.tag_alpha,
+                          tag_connect: this.data.tag_connect,
+                          tag_churchschool: this.data.tag_churchschool,
+                          tag_yam: this.data.tag_yam,
+                          tag_cvl: this.data.tag_cvl,
+                          tag_pastor: this.data.tag_pastor,
+                          tag_nocontact: this.data.tag_nocontact };
+
+    this.summaryRef.update(summary_data).then( () => this.navCtrl.pop() );
+  }
+
   submitEdit() {
-    
+    this.newcomerdetailsRef.update(this.data)
+      .then( () => this.addToSummary());
   }
 
   undoEdit() {
