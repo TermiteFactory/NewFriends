@@ -13,13 +13,13 @@
     </ion-buttons>
   </ion-navbar>
   <ion-toolbar>
-    <ion-searchbar></ion-searchbar>
+    <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="setFilteredItems()"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 
 <ion-content padding>
   <ion-list>
-    <matchstick-bydate-newcomers *ngFor="let person of newcomersSummary | async | reverse | headers" [person]=person></matchstick-bydate-newcomers>
+    <matchstick-bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [person]=person></matchstick-bydate-newcomers>
   </ion-list>
 </ion-content>
