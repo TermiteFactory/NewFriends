@@ -37,13 +37,13 @@ export const firebaseConfig = {
     TabsPage,
     ByDateNewcomers,
     ReversePipe,
-    HeadersPipe
+    HeadersPipe,
   ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp, {tabsHideOnSubPages: true}),
     AngularFireModule.initializeApp(firebaseConfig),
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -52,7 +52,7 @@ export const firebaseConfig = {
     ForMePage,
     GroupsPage,
     SettingsPage,
-    TabsPage
+    TabsPage,
   ],
   providers: [
     StatusBar,
