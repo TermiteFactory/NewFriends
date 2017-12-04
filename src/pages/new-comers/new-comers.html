@@ -20,6 +20,6 @@
 
 <ion-content padding>
   <ion-list>
-    <matchstick-bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [person]=person></matchstick-bydate-newcomers>
+    <bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [person]=person></bydate-newcomers>
   </ion-list>
 </ion-content>

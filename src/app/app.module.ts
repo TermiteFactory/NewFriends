@@ -8,15 +8,16 @@ import { ForMePage } from '../pages/for-me/for-me';
 import { GroupsPage } from '../pages/groups/groups';
 import { SettingsPage } from '../pages/settings/settings';
 import { TabsPage } from '../pages/tabs/tabs';
-import { ByDateNewcomers } from '../pages/new-comers/bydate-newcomers'
-import { ReversePipe } from '../pages/new-comers/reverse'
-import { HeadersPipe } from '../pages/new-comers/headers'
+
+import {ComponentsModule} from '../components/components.module'
+import {PipesModule} from '../pipes/pipes.module'
 
 import {AngularFireModule } from 'angularfire2'
 import {AngularFireDatabaseModule} from 'angularfire2/database'
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { AuthProvider } from '../providers/auth/auth';
 
 export const firebaseConfig = {
     apiKey: "AIzaSyAzZg3R8ulG2jfqAOlemmG9gZ_YeexvZhI",
@@ -35,15 +36,14 @@ export const firebaseConfig = {
     GroupsPage,
     SettingsPage,
     TabsPage,
-    ByDateNewcomers,
-    ReversePipe,
-    HeadersPipe,
   ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp, {tabsHideOnSubPages: true}),
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule,
+    ComponentsModule,
+    PipesModule,
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -57,7 +57,8 @@ export const firebaseConfig = {
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    AuthProvider
   ]
 })
 export class AppModule {}
