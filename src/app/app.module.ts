@@ -14,6 +14,7 @@ import {PipesModule} from '../pipes/pipes.module'
 
 import {AngularFireModule } from 'angularfire2'
 import {AngularFireDatabaseModule} from 'angularfire2/database'
+import {AngularFireAuthModule} from 'angularfire2/auth'
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -44,6 +45,7 @@ export const firebaseConfig = {
     AngularFireDatabaseModule,
     ComponentsModule,
     PipesModule,
+    AngularFireAuthModule,
   ],
   bootstrap: [IonicApp],
   entryComponents: [

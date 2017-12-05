@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireObject } from 'angularfire2/database/interfaces';
+import { OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
 
 /**
  * Generated class for the NewcomerDetailsPage page.
@@ -15,7 +17,7 @@ import { AngularFireObject } from 'angularfire2/database/interfaces';
   selector: 'page-newcomer-details',
   templateUrl: 'newcomer-details.html',
 })
-export class NewcomerDetailsPage {
+export class NewcomerDetailsPage implements OnDestroy {
   
   data : { 
     dateVisited: String,
@@ -54,12 +56,13 @@ export class NewcomerDetailsPage {
     myNavCtrl: NavController;
     myNavParams: NavParams;
     newcomerdetailsRef: AngularFireObject<any>;
+    sub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
     this.myNavCtrl = navCtrl;
     this.myNavParams = navParams;
     this.newcomerdetailsRef= afd.object('/bykey/' + navParams.data.newcomerkey);
-    this.newcomerdetailsRef.valueChanges().subscribe( mydata => this.data = mydata);
+    this.sub = this.newcomerdetailsRef.valueChanges().subscribe( mydata => this.data = mydata);
   }
 
   ionViewDidLoad() {
@@ -69,6 +72,10 @@ export class NewcomerDetailsPage {
   editNewcomer() {
     this.myNavCtrl.push("EditNewcomerPage", { newcomerkey: this.myNavParams.data.newcomerkey, 
                                               summarykey: this.myNavParams.data.summarykey });
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
 }

@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+import { OnDestroy } from '@angular/core';
 
 /**
  * Generated class for the NewComersPage page.
@@ -14,17 +16,18 @@ import { Observable } from 'rxjs/Observable';
   selector: 'page-new-comers',
   templateUrl: 'new-comers.html'
 })
-export class NewComersPage {
+export class NewComersPage implements OnDestroy {
   newcomersSummary: Observable<any[]>;
   filteredSummaryList: any[];
   originalSummaryList: any[]; 
   searchTerm: string = '';
+  sub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
     this.newcomersSummary = afd.list('/summary', ref=>ref.orderByChild("date")).snapshotChanges().map(changes => {
       return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
     });
-    this.newcomersSummary.subscribe( data => {
+    this.sub = this.newcomersSummary.subscribe( data => {
         this.originalSummaryList = data;
         this.setFilteredItems();
      });
@@ -49,6 +52,10 @@ export class NewComersPage {
     } else {
       this.filteredSummaryList = this.originalSummaryList;
     }
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
 }

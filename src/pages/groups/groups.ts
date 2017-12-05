@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { Subscription } from 'rxjs/Subscription';
+import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 
 /**
  * Generated class for the GroupsPage page.
@@ -13,7 +15,7 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
   selector: 'page-groups',
   templateUrl: 'groups.html',
 })
-export class GroupsPage {
+export class GroupsPage implements OnDestroy{
 
   groupsListing: {label: string, tag: string, count: number}[] = 
             [ 
@@ -26,11 +28,12 @@ export class GroupsPage {
               { label: "Do not Contact", tag: "tag_nocontact", count: 0 }
             ];
   myNavCtrl: NavController;
+  sub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
     this.myNavCtrl = navCtrl;
 
-    afd.list('/summary').valueChanges().subscribe( people => {
+    this.sub = afd.list('/summary').valueChanges().subscribe( people => {
       this.groupsListing.forEach(listing => listing.count = 0);
       people.forEach( person => {
          this.groupsListing.forEach(listing => {
@@ -48,6 +51,10 @@ export class GroupsPage {
 
   showGroupList(tagname : string, labelname: string) {
     this.myNavCtrl.push("GroupListPage", { tag_name: tagname, label_name: labelname });
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
 }

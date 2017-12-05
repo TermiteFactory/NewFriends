@@ -3,6 +3,8 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireObject } from 'angularfire2/database/interfaces';
+import { Subscription } from 'rxjs/Subscription';
+import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 
 /**
  * Generated class for the EditNewcomerPage page.
@@ -16,7 +18,7 @@ import { AngularFireObject } from 'angularfire2/database/interfaces';
   selector: 'page-edit-newcomer',
   templateUrl: 'edit-newcomer.html',
 })
-export class EditNewcomerPage {
+export class EditNewcomerPage implements OnDestroy{
 
   newcomerdetailsRef: AngularFireObject<any>;
   summaryRef: AngularFireObject<any>;
@@ -89,12 +91,13 @@ export class EditNewcomerPage {
       tag_nocontact : false 
     };
     myNavCtrl: NavController;
+    sub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
     this.myNavCtrl = navCtrl;
     this.summaryRef = afd.object('/summary/' + navParams.data.summarykey);
     this.newcomerdetailsRef= afd.object('/bykey/' + navParams.data.newcomerkey);
-    this.newcomerdetailsRef.valueChanges().subscribe( mydata => {
+    this.sub = this.newcomerdetailsRef.valueChanges().subscribe( mydata => {
                                       this.data_db = mydata;
                                       Object.assign(this.data, mydata); 
                                 });
@@ -133,6 +136,10 @@ export class EditNewcomerPage {
 
   undoEdit() {
     Object.assign(this.data, this.data_db);
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
 }
