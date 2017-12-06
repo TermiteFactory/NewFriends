@@ -26,7 +26,7 @@ export class SettingsPage {
 
   logoutUser() {
     this.authData.logoutUser().then( () => {
-      this.app.getRootNav().setRoot(LoginPage);
+      this.app.getRootNav().setRoot('LoginPage');
     });
   }
 
