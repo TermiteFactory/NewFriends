@@ -9,6 +9,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthProvider } from '../../providers/auth/auth';
 import { TabsPage } from '../tabs/tabs';
 import { EmailValidator } from '../../validators/email';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+
 
 /**
  * Generated class for the SignupPage page.
@@ -28,11 +30,12 @@ export class SignupPage {
 
   constructor(public navCtrl: NavController, public authData: AuthProvider, 
     public formBuilder: FormBuilder, public loadingCtrl: LoadingController, 
-    public alertCtrl: AlertController) {
+    public alertCtrl: AlertController, public afd:AngularFireDatabase) {
 
       this.signupForm = formBuilder.group({
         email: ['', Validators.compose([Validators.required, EmailValidator.isValid])],
-        password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
+        password: ['', Validators.compose([Validators.minLength(6), Validators.required])],
+        username: ['', Validators.compose([Validators.required])],
       });
   }
 
@@ -51,7 +54,8 @@ export class SignupPage {
       console.log(this.signupForm.value);
     } else {
       this.authData.signupUser(this.signupForm.value.email, this.signupForm.value.password)
-      .then(() => {
+      .then((userdata) => {
+        this.afd.list('/profiles').push({name: this.signupForm.value.username, uid: userdata.uid});
         this.navCtrl.setRoot(TabsPage);
       }, (error) => {
         this.loading.dismiss().then( () => {
