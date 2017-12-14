@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { AngularFireObject } from 'angularfire2/database/interfaces';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
-
+import { MatchstickDbProvider, SummaryData, DetailedData } from '../../providers/matchstick-db/matchstick-db';
 /**
  * Generated class for the EditNewcomerPage page.
  *
@@ -20,87 +20,15 @@ import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 })
 export class EditNewcomerPage implements OnDestroy{
 
-  newcomerdetailsRef: AngularFireObject<any>;
-  summaryRef: AngularFireObject<any>;
-  data_db : { 
-    dateVisited: String,
-    name : String
-    cameWith : String
-    age: String
-    phone: String
-    email: String
-    religion: String
-    purpose: String
-    visitedBefore: String
-    tag_alpha: boolean,
-    tag_connect: boolean,
-    tag_churchschool: boolean,
-    tag_yam: boolean,
-    tag_cvl: boolean,
-    tag_pastor: boolean,
-    tag_nocontact: boolean } = {
-      dateVisited : "",
-      name : "",
-      cameWith : "",
-      age : "",
-      phone : "",
-      email : "",
-      religion : "",
-      purpose : "",
-      visitedBefore : "",
-      tag_alpha : false,
-      tag_connect : false,
-      tag_churchschool : false,
-      tag_yam : false,
-      tag_cvl : false,
-      tag_pastor : false,
-      tag_nocontact : false 
-    };
-  data : { 
-    dateVisited: String,
-    name : String
-    cameWith : String
-    age: String
-    phone: String
-    email: String
-    religion: String
-    purpose: String
-    visitedBefore: String
-    tag_alpha: boolean,
-    tag_connect: boolean,
-    tag_churchschool: boolean,
-    tag_yam: boolean,
-    tag_cvl: boolean,
-    tag_pastor: boolean,
-    tag_nocontact: boolean } = {
-      dateVisited : "",
-      name : "",
-      cameWith : "",
-      age : "",
-      phone : "",
-      email : "",
-      religion : "",
-      purpose : "",
-      visitedBefore : "",
-      tag_alpha : false,
-      tag_connect : false,
-      tag_churchschool : false,
-      tag_yam : false,
-      tag_cvl : false,
-      tag_pastor : false,
-      tag_nocontact : false 
-    };
-    myNavCtrl: NavController;
-    sub: Subscription;
+  db_data: DetailedData = new DetailedData;
+  local_data: DetailedData = new DetailedData;
+  sub: Subscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
-    this.myNavCtrl = navCtrl;
-    this.summaryRef = afd.object('/summary/' + navParams.data.summarykey);
-    this.newcomerdetailsRef= afd.object('/bykey/' + navParams.data.newcomerkey);
-    this.sub = this.newcomerdetailsRef.valueChanges().subscribe( mydata => {
-                                      this.data_db = mydata;
-                                      Object.assign(this.data, mydata); 
-                                });
+  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
+    this.sub = this.matchDb.getDetailedRef(navParams.data.newcomerkey).valueChanges().subscribe( mydata => {
+      this.db_data.data = mydata;
+      Object.assign(this.local_data.data, mydata); 
+    });
   }
 
   ionViewDidLoad() {
@@ -108,34 +36,21 @@ export class EditNewcomerPage implements OnDestroy{
   }
 
   deleteNewcomer() {
-    this.newcomerdetailsRef.remove().then (
-      () => this.summaryRef.remove().then (
-        () => this.myNavCtrl.popToRoot()
-      )
-    );
-  }
-
-  addToSummary() {
-    let summary_data = {  date: this.data.dateVisited,
-                          name: this.data.name,
-                          tag_alpha: this.data.tag_alpha,
-                          tag_connect: this.data.tag_connect,
-                          tag_churchschool: this.data.tag_churchschool,
-                          tag_yam: this.data.tag_yam,
-                          tag_cvl: this.data.tag_cvl,
-                          tag_pastor: this.data.tag_pastor,
-                          tag_nocontact: this.data.tag_nocontact };
-
-    this.summaryRef.update(summary_data).then( () => this.navCtrl.pop() );
+    this.matchDb.deleteData(this.navParams.data.newcomerkey, this.navParams.data.summarykey).then( () => {
+      this.navCtrl.popToRoot();
+    });
   }
 
   submitEdit() {
-    this.newcomerdetailsRef.update(this.data)
-      .then( () => this.addToSummary());
+    this.matchDb.updateData(this.navParams.data.newcomerkey, 
+                            this.navParams.data.summarykey, 
+                            this.local_data).then( () => {
+      this.navCtrl.pop();
+    });
   }
 
   undoEdit() {
-    Object.assign(this.data, this.data_db);
+    Object.assign(this.local_data.data, this.db_data.data);
   }
 
   ngOnDestroy() {

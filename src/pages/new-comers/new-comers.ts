@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
@@ -23,11 +23,8 @@ export class NewComersPage implements OnDestroy {
   searchTerm: string = '';
   sub: Subscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
-    this.newcomersSummary = afd.list('/summary', ref=>ref.orderByChild("date")).snapshotChanges().map(changes => {
-      return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
-    });
-    this.sub = this.newcomersSummary.subscribe( data => {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
+    this.sub = matchDb.getSummaryList(ref=>ref.orderByChild("date")).subscribe( data => {
         this.originalSummaryList = data;
         this.setFilteredItems();
      });

@@ -55,7 +55,7 @@ export class SignupPage {
     } else {
       this.authData.signupUser(this.signupForm.value.email, this.signupForm.value.password)
       .then((userdata) => {
-        this.afd.list('/profiles').push({name: this.signupForm.value.username, uid: userdata.uid});
+        this.authData.addProfileData(this.signupForm.value.username);
         this.navCtrl.setRoot(TabsPage);
       }, (error) => {
         this.loading.dismiss().then( () => {

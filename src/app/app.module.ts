@@ -19,6 +19,7 @@ import {AngularFireAuthModule} from 'angularfire2/auth'
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AuthProvider } from '../providers/auth/auth';
+import { MatchstickDbProvider } from '../providers/matchstick-db/matchstick-db';
 
 export const firebaseConfig = {
     apiKey: "AIzaSyAzZg3R8ulG2jfqAOlemmG9gZ_YeexvZhI",
@@ -60,7 +61,8 @@ export const firebaseConfig = {
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    AuthProvider
+    AuthProvider,
+    MatchstickDbProvider
   ]
 })
 export class AppModule {}

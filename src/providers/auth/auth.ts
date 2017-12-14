@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
 import firebase from 'firebase/app';
+import { Observable } from 'rxjs/Observable';
 
 /*
   Generated class for the AuthProvider provider.
@@ -28,5 +29,15 @@ export class AuthProvider {
 
   signupUser(newEmail: string, newPassword: string): Promise<any> {
     return this.afAuth.auth.createUserWithEmailAndPassword(newEmail, newPassword);
+  }
+
+  addProfileData(name: string) {
+    return this.afAuth.authState.subscribe(user => {
+      user.updateProfile({displayName: name, photoURL: null});
+    });
+  }
+
+  getUserObj() : Observable<firebase.User> {
+    return this.afAuth.authState;
   }
 }

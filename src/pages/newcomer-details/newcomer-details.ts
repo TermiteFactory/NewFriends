@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFireObject } from 'angularfire2/database/interfaces';
 import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
+import { AlertController } from 'ionic-angular';
+import { MatchstickDbProvider, SummaryData, DetailedData } from '../../providers/matchstick-db/matchstick-db';
 
 /**
  * Generated class for the NewcomerDetailsPage page.
@@ -18,51 +18,15 @@ import { Subscription } from 'rxjs/Subscription';
   templateUrl: 'newcomer-details.html',
 })
 export class NewcomerDetailsPage implements OnDestroy {
-  
-  data : { 
-    dateVisited: String,
-    name : String
-    cameWith : String
-    age: String
-    phone: String
-    email: String
-    religion: String
-    purpose: String
-    visitedBefore: String
-    tag_alpha: boolean,
-    tag_connect: boolean,
-    tag_churchschool: boolean,
-    tag_yam: boolean,
-    tag_cvl: boolean,
-    tag_pastor: boolean,
-    tag_nocontact: boolean } = {
-      dateVisited : "",
-      name : "",
-      cameWith : "",
-      age : "",
-      phone : "",
-      email : "",
-      religion : "",
-      purpose : "",
-      visitedBefore : "",
-      tag_alpha : false,
-      tag_connect : false,
-      tag_churchschool : false,
-      tag_yam : false,
-      tag_cvl : false,
-      tag_pastor : false,
-      tag_nocontact : false 
-    };
-    myNavCtrl: NavController;
-    myNavParams: NavParams;
-    newcomerdetailsRef: AngularFireObject<any>;
-    sub: Subscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
-    this.myNavCtrl = navCtrl;
-    this.myNavParams = navParams;
-    this.newcomerdetailsRef= afd.object('/bykey/' + navParams.data.newcomerkey);
-    this.sub = this.newcomerdetailsRef.valueChanges().subscribe( mydata => this.data = mydata);
+  local_data: DetailedData = new DetailedData;
+  sub: Subscription;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
+    public alertCtrl: AlertController) {
+      this.sub = this.matchDb.getDetailedRef(navParams.data.newcomerkey).valueChanges().subscribe( data => {
+        this.local_data.data = data; 
+      });
   }
 
   ionViewDidLoad() {
@@ -70,12 +34,39 @@ export class NewcomerDetailsPage implements OnDestroy {
   }
 
   editNewcomer() {
-    this.myNavCtrl.push("EditNewcomerPage", { newcomerkey: this.myNavParams.data.newcomerkey, 
-                                              summarykey: this.myNavParams.data.summarykey });
+    this.navCtrl.push("EditNewcomerPage", { newcomerkey: this.navParams.data.newcomerkey, 
+                                            summarykey: this.navParams.data.summarykey });
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+  }
+
+  commentPrompt() {
+    let prompt = this.alertCtrl.create({
+      title: 'Comment',
+      inputs: [
+        {
+          name: 'comment',
+          placeholder: 'Comment'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Save',
+          handler: data => {
+            console.log('Saved clicked');
+          }
+        }
+      ]
+    });
+    prompt.present();
   }
 
 }

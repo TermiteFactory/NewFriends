@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 
@@ -30,10 +30,8 @@ export class GroupsPage implements OnDestroy{
   myNavCtrl: NavController;
   sub: Subscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
-    this.myNavCtrl = navCtrl;
-
-    this.sub = afd.list('/summary').valueChanges().subscribe( people => {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
+    this.sub = matchDb.getSummaryList().subscribe( people => {
       this.groupsListing.forEach(listing => listing.count = 0);
       people.forEach( person => {
          this.groupsListing.forEach(listing => {
@@ -50,7 +48,7 @@ export class GroupsPage implements OnDestroy{
   }
 
   showGroupList(tagname : string, labelname: string) {
-    this.myNavCtrl.push("GroupListPage", { tag_name: tagname, label_name: labelname });
+    this.navCtrl.push("GroupListPage", { tag_name: tagname, label_name: labelname });
   }
 
   ngOnDestroy() {

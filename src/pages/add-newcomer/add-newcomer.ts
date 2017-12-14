@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { MatchstickDbProvider, SummaryData, DetailedData } from '../../providers/matchstick-db/matchstick-db';
 
 /**
  * Generated class for the AddNewcomerPage page.
@@ -16,30 +16,9 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 })
 export class AddNewcomerPage {
 
-  data : { 
-    dateVisited: String,
-    name : String
-    cameWith : String
-    age: String
-    phone: String
-    email: String
-    religion: String
-    purpose: String
-    visitedBefore: String
-    tag_alpha: boolean,
-    tag_connect: boolean,
-    tag_churchschool: boolean,
-    tag_yam: boolean,
-    tag_cvl: boolean,
-    tag_pastor: boolean,
-    tag_nocontact: boolean }; 
+  newComer: DetailedData = new DetailedData;
 
-  newcomerRef : AngularFireList<any>;
-  summaryRef : AngularFireList<any>;
-  myAfd: AngularFireDatabase; 
-
-  constructor(public navCtrl: NavController, public navParams: NavParams, public afd:AngularFireDatabase) {
-    let today = new Date();
+  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
     
     function pad(datenum: Number) {
       let datestring : String;
@@ -51,55 +30,19 @@ export class AddNewcomerPage {
         return '0' + datestring;
       }
     }
-    
-    let todaystring = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate()); 
 
-    this.data = {
-      dateVisited : todaystring,
-      name : "",
-      cameWith : "",
-      age : "",
-      phone : "",
-      email : "",
-      religion : "",
-      purpose : "",
-      visitedBefore : "",
-      tag_alpha : false,
-      tag_connect : false,
-      tag_churchschool : false,
-      tag_yam : false,
-      tag_cvl : false,
-      tag_pastor : false,
-      tag_nocontact : false 
-    };
-    
-    this.myAfd = afd;
-    this.newcomerRef = afd.list('/bykey');
-    this.summaryRef = afd.list('/summary')
+    let today = new Date;
+    this.newComer.data.dateVisited= today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate()); 
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad AddNewcomerPage');
   }
 
-  addToSummary(newcomerKey) {
-    let summary_data = {  date: this.data.dateVisited,
-                          name: this.data.name,
-                          details_key: newcomerKey.key,
-                          tag_alpha: this.data.tag_alpha,
-                          tag_connect: this.data.tag_connect,
-                          tag_churchschool: this.data.tag_churchschool,
-                          tag_yam: this.data.tag_yam,
-                          tag_cvl: this.data.tag_cvl,
-                          tag_pastor: this.data.tag_pastor,
-                          tag_nocontact: this.data.tag_nocontact };
-
-    this.summaryRef.push(summary_data).then( () => this.navCtrl.pop());
-  }
-
   submit() {
-    this.newcomerRef.push(this.data)
-      .then( (key) => this.addToSummary(key));
+    this.matchDb.addData(this.newComer).then( ()=> {
+      this.navCtrl.pop();
+    });
   }
 
 }
