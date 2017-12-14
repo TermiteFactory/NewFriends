@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthProvider } from '../../providers/auth/auth';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireObject, QueryFn } from 'angularfire2/database/interfaces';
 import { Observable } from 'rxjs/Observable';
 
