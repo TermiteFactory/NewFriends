@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { AngularFireObject, QueryFn } from 'angularfire2/database/interfaces';
 import firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
@@ -13,14 +15,23 @@ import { Observable } from 'rxjs/Observable';
 export class AuthProvider {
 
   name: string;
-  profileKey: string;
+  uid: string;
   community: string; 
 
-  constructor(public afAuth: AngularFireAuth) {
+  constructor(public afAuth: AngularFireAuth, public afd:AngularFireDatabase) {
   }
 
   loginUser(newEmail: string, newPassword: string): Promise<any> {
-    return this.afAuth.auth.signInWithEmailAndPassword(newEmail, newPassword);
+    return new Promise( (response, reject) => {
+      this.afAuth.auth.signInWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
+        this.getProfileData();
+        this.afd.object('/profiles/' + userdata.uid).valueChanges().subscribe( (profile) => {
+          this.community = profile.community;    
+        });
+
+        response(userdata);   
+      }, (error) => reject(error));
+    });
   }
 
   resetPassword(email: string): Promise<void> {
@@ -36,15 +47,23 @@ export class AuthProvider {
       this.afAuth.auth.createUserWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
         this.addProfileData(username);
         this.name = username;
-        this.profileKey = userdata.key;
+        this.uid = userdata.uid;
+        this.afd.list('/profiles').push({community: ""});
+
         response(userdata);   
       }, (error) => reject(error));
     });
   }
 
   addProfileData(name: string) {
-    return this.afAuth.authState.subscribe(user => {
-      user.updateProfile({displayName: name, photoURL: null});
+    return this.afAuth.authState.subscribe(auth => {
+      auth.updateProfile({displayName: name, photoURL: null});
+    });
+  }
+
+  getProfileData() {
+    return this.afAuth.authState.subscribe(auth => {
+      this.name = auth.displayName;
     });
   }
 
