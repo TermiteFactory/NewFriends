@@ -18,10 +18,8 @@ import { Observable } from 'rxjs/Observable';
   templateUrl: 'settings.html',
 })
 export class SettingsPage {
-  userObj: Observable<firebase.User>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,public authData: AuthProvider, public app: App) {
-    this.userObj = this.authData.getUserObj();
   }
 
   ionViewDidLoad() {

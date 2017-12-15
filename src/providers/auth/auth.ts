@@ -14,9 +14,9 @@ import { Observable } from 'rxjs/Observable';
 @Injectable()
 export class AuthProvider {
 
-  name: string;
-  uid: string;
-  community: string; 
+  name: string = "";
+  uid: string = "";
+  community: string = ""; 
 
   constructor(public afAuth: AngularFireAuth, public afd:AngularFireDatabase) {
   }
@@ -25,13 +25,19 @@ export class AuthProvider {
     return new Promise( (response, reject) => {
       this.afAuth.auth.signInWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
         this.getProfileData();
-        this.afd.object('/profiles/' + userdata.uid).valueChanges().subscribe( (profile) => {
-          this.community = profile.community;    
+        this.getProfiles(userdata.uid).valueChanges().subscribe( (data) => {
+          if (data!=null) {
+            this.community = data.community;
+          }
         });
 
         response(userdata);   
       }, (error) => reject(error));
     });
+  }
+
+  getProfiles(uid: string) : AngularFireObject<Profile> {
+    return this.afd.object('/profiles/' + uid);
   }
 
   resetPassword(email: string): Promise<void> {
@@ -48,7 +54,7 @@ export class AuthProvider {
         this.addProfileData(username);
         this.name = username;
         this.uid = userdata.uid;
-        this.afd.list('/profiles').push({community: ""});
+        this.afd.list('/profiles').push(new Profile);
 
         response(userdata);   
       }, (error) => reject(error));
@@ -63,11 +69,16 @@ export class AuthProvider {
 
   getProfileData() {
     return this.afAuth.authState.subscribe(auth => {
-      this.name = auth.displayName;
+      if (auth!=null) {
+        this.name = auth.displayName;
+      }
     });
   }
+}
 
-  getUserObj() : Observable<firebase.User> {
-    return this.afAuth.authState;
+export class Profile {
+  community: string = "";
+
+  constructor() {
   }
 }
