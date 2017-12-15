@@ -17,7 +17,6 @@ import { OnDestroy } from '@angular/core';
   templateUrl: 'new-comers.html'
 })
 export class NewComersPage implements OnDestroy {
-  newcomersSummary: Observable<any[]>;
   filteredSummaryList: any[];
   originalSummaryList: any[]; 
   searchTerm: string = '';

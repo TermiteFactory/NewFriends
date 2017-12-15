@@ -53,9 +53,10 @@ export class SignupPage {
     if (!this.signupForm.valid){
       console.log(this.signupForm.value);
     } else {
-      this.authData.signupUser(this.signupForm.value.email, this.signupForm.value.password)
+      this.authData.signupUser(this.signupForm.value.email, 
+                               this.signupForm.value.password,
+                               this.signupForm.value.username)
       .then((userdata) => {
-        this.authData.addProfileData(this.signupForm.value.username);
         this.navCtrl.setRoot(TabsPage);
       }, (error) => {
         this.loading.dismiss().then( () => {

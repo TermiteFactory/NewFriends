@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { MatchstickDbProvider, SummaryData, DetailedData } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-db/matchstick-db';
 
 /**
  * Generated class for the AddNewcomerPage page.
@@ -32,7 +32,7 @@ export class AddNewcomerPage {
     }
 
     let today = new Date;
-    this.newComer.data.dateVisited= today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate()); 
+    this.newComer.dateVisited= today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate()); 
   }
 
   ionViewDidLoad() {

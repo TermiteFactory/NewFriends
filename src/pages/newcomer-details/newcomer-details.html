@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title> {{local_data.data.name}} </ion-title>
+    <ion-title> {{local_data.name}} </ion-title>
     <ion-buttons end>
       <button ion-button icon-left (click)="editNewcomer()">
         <ion-icon name="create"></ion-icon>Edit Details</button>
@@ -21,39 +21,39 @@
       <ion-list>
         <ion-item>
           <ion-label stacked>Name</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.data.name"></ion-input>
+          <ion-input readonly type="text" [ngModel]="local_data.name"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Visited On</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.data.dateVisited"></ion-input>
+          <ion-input readonly type="text" [ngModel]="local_data.dateVisited"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Came With</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.data.cameWith"></ion-input>
+          <ion-input readonly type="text" [ngModel]="local_data.cameWith"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Age</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.data.age"></ion-input>
+          <ion-input readonly type="text" [ngModel]="local_data.age"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Phone</ion-label>
-          <ion-input readonly type="tel" [ngModel]="local_data.data.phone"></ion-input>
+          <ion-input readonly type="tel" [ngModel]="local_data.phone"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Email</ion-label>
-          <ion-input readonly type="email" [ngModel]="local_data.data.email"></ion-input>
+          <ion-input readonly type="email" [ngModel]="local_data.email"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Religion</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.data.religion"></ion-input>
+          <ion-input readonly type="text" [ngModel]="local_data.religion"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Purpose for Visit</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.data.purpose"></ion-input>
+          <ion-input readonly type="text" [ngModel]="local_data.purpose"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Visited Before?</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.data.visitedBefore"></ion-input>
+          <ion-input readonly type="text" [ngModel]="local_data.visitedBefore"></ion-input>
         </ion-item>
       </ion-list>
     </ion-card-content>

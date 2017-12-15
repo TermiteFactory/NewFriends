@@ -3,7 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { AlertController } from 'ionic-angular';
-import { MatchstickDbProvider, SummaryData, DetailedData } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-db/matchstick-db';
 
 /**
  * Generated class for the NewcomerDetailsPage page.
@@ -25,7 +25,7 @@ export class NewcomerDetailsPage implements OnDestroy {
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
     public alertCtrl: AlertController) {
       this.sub = this.matchDb.getDetailedRef(navParams.data.newcomerkey).valueChanges().subscribe( data => {
-        this.local_data.data = data; 
+        this.local_data = data; 
       });
   }
 

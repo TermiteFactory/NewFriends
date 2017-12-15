@@ -12,6 +12,10 @@ import { Observable } from 'rxjs/Observable';
 @Injectable()
 export class AuthProvider {
 
+  name: string;
+  profileKey: string;
+  community: string; 
+
   constructor(public afAuth: AngularFireAuth) {
   }
 
@@ -27,8 +31,15 @@ export class AuthProvider {
     return this.afAuth.auth.signOut();
   }
 
-  signupUser(newEmail: string, newPassword: string): Promise<any> {
-    return this.afAuth.auth.createUserWithEmailAndPassword(newEmail, newPassword);
+  signupUser(newEmail: string, newPassword: string, username: string): Promise<any> {
+    return new Promise( (response, reject) => {
+      this.afAuth.auth.createUserWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
+        this.addProfileData(username);
+        this.name = username;
+        this.profileKey = userdata.key;
+        response(userdata);   
+      }, (error) => reject(error));
+    });
   }
 
   addProfileData(name: string) {

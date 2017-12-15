@@ -35,7 +35,7 @@ export class MatchstickDbProvider {
 
   updateData( detailedKey: string, summaryKey: string, data: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
-      this.getDetailedRef(detailedKey).update(data.data).then(() => {
+      this.getDetailedRef(detailedKey).update(data).then(() => {
         let summarydata = new SummaryData;
         this.copyToSummary(data, summarydata);
         this.getSummaryRef(summaryKey).update(summarydata).then( () => {
@@ -47,11 +47,11 @@ export class MatchstickDbProvider {
 
   addData(detailData: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
-      this.getDetailedListRef().push(detailData.data).then( pushRtn => {
+      this.getDetailedListRef().push(detailData).then( pushRtn => {
         let summary: SummaryDataKey = new SummaryDataKey;
         this.copyToSummary(detailData, summary);
-        summary.data.details_key = pushRtn.key;
-        this.getSummaryListRef().push(summary.data).then( () => {
+        summary.details_key = pushRtn.key;
+        this.getSummaryListRef().push(summary).then( () => {
           resolve();
         }, () => reject() );
       }, () => reject() );
@@ -68,16 +68,16 @@ export class MatchstickDbProvider {
     });
   }
 
-  copyToSummary (from: DetailedData, to: any)  {
-    to.data.date = from.data.dateVisited;
-    to.data.name = from.data.name;
-    to.data.tag_alpha = from.data.tag_alpha;
-    to.data.tag_connect = from.data.tag_connect;
-    to.data.tag_churchschool = from.data.tag_churchschool;
-    to.data.tag_yam = from.data.tag_yam;
-    to.data.tag_cvl = from.data.tag_cvl;
-    to.data.tag_pastor = from.data.tag_pastor;
-    to.data.tag_nocontact = from.data.tag_nocontact;
+  copyToSummary (from: DetailedData, to: SummaryData)  {
+    to.date = from.dateVisited;
+    to.name = from.name;
+    to.tag_alpha = from.tag_alpha;
+    to.tag_connect = from.tag_connect;
+    to.tag_churchschool = from.tag_churchschool;
+    to.tag_yam = from.tag_yam;
+    to.tag_cvl = from.tag_cvl;
+    to.tag_pastor = from.tag_pastor;
+    to.tag_nocontact = from.tag_nocontact;
   }
 
   getSummaryList(queryFn?: QueryFn): Observable<any[]> {
@@ -87,96 +87,48 @@ export class MatchstickDbProvider {
   }
 }
 
-export class SummaryDataKey {
-  data: {  
-    date: string,
-    name: string,
-    details_key: string,
-    tag_alpha: boolean,
-    tag_connect: boolean,
-    tag_churchschool: boolean,
-    tag_yam: boolean,
-    tag_cvl: boolean,
-    tag_pastor: boolean,
-    tag_nocontact: boolean } = {
-      date: "",
-      name: "",
-      details_key: "",
-      tag_alpha: false,
-      tag_connect: false,
-      tag_churchschool: false,
-      tag_yam: false,
-      tag_cvl: false,
-      tag_pastor: false,
-      tag_nocontact: false
-    }
+export class SummaryData {
+  date: string = "";
+  name: string = "";
+  details_key: string = "";
+  tag_alpha: boolean = false;
+  tag_connect: boolean = false;
+  tag_churchschool: boolean = false;
+  tag_yam: boolean = false;
+  tag_cvl: boolean = false;
+  tag_pastor: boolean = false;
+  tag_nocontact: boolean = false;
 
   constructor() {
   }
 }
 
-export class SummaryData {
-    data: {  
-      date: string,
-      name: string,
-      tag_alpha: boolean,
-      tag_connect: boolean,
-      tag_churchschool: boolean,
-      tag_yam: boolean,
-      tag_cvl: boolean,
-      tag_pastor: boolean,
-      tag_nocontact: boolean } = {
-        date: "",
-        name: "",
-        tag_alpha: false,
-        tag_connect: false,
-        tag_churchschool: false,
-        tag_yam: false,
-        tag_cvl: false,
-        tag_pastor: false,
-        tag_nocontact: false
-      }
+export class SummaryDataKey extends SummaryData {
+  details_key: string = "";
 
-    constructor() {
-    }
+  constructor() {
+    super();
+  }
 }
 
 export class DetailedData {
-  data : { 
-    dateVisited: string,
-    name : string
-    cameWith : string
-    age: string
-    phone: string
-    email: string
-    religion: string
-    purpose: string
-    visitedBefore: string
-    tag_alpha: boolean,
-    tag_connect: boolean,
-    tag_churchschool: boolean,
-    tag_yam: boolean,
-    tag_cvl: boolean,
-    tag_pastor: boolean,
-    tag_nocontact: boolean  } = {
-      dateVisited : "",
-      name : "",
-      cameWith : "",
-      age : "",
-      phone : "",
-      email : "",
-      religion : "",
-      purpose : "",
-      visitedBefore : "",
-      tag_alpha : false,
-      tag_connect : false,
-      tag_churchschool : false,
-      tag_yam : false,
-      tag_cvl : false,
-      tag_pastor : false,
-      tag_nocontact : false
-    };
+  dateVisited: string = "";
+  name : string = "";
+  cameWith : string = "";
+  age: string = "";
+  phone: string = "";
+  email: string = "";
+  religion: string = "";
+  purpose: string = "";
+  visitedBefore: string = "";
+  tag_alpha: boolean = false;
+  tag_connect: boolean = false;
+  tag_churchschool: boolean = false;
+  tag_yam: boolean = false;
+  tag_cvl: boolean = false;
+  tag_pastor: boolean = false;
+  tag_nocontact: boolean = false;
 
-    constructor() {
-    }
+  constructor() {
+  }
 }

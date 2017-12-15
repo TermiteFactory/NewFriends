@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { AngularFireObject } from 'angularfire2/database/interfaces';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
-import { MatchstickDbProvider, SummaryData, DetailedData } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-db/matchstick-db';
 /**
  * Generated class for the EditNewcomerPage page.
  *
@@ -26,8 +26,8 @@ export class EditNewcomerPage implements OnDestroy{
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
     this.sub = this.matchDb.getDetailedRef(navParams.data.newcomerkey).valueChanges().subscribe( mydata => {
-      this.db_data.data = mydata;
-      Object.assign(this.local_data.data, mydata); 
+      this.db_data = mydata;
+      Object.assign(this.local_data, mydata); 
     });
   }
 
@@ -50,7 +50,7 @@ export class EditNewcomerPage implements OnDestroy{
   }
 
   undoEdit() {
-    Object.assign(this.local_data.data, this.db_data.data);
+    Object.assign(this.local_data, this.db_data);
   }
 
   ngOnDestroy() {
