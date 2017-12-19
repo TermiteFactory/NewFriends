@@ -7,12 +7,34 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>{{ authData.name }}'s Settings</ion-title>
+    <ion-title>{{ (authData.authState | async)?.displayName }}'s Settings</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <button ion-button color="danger" (click)="logoutUser()" full>Logout</button>
+  <ion-list>
+    <ion-list-header>Account</ion-list-header>
+    <ion-item>
+      <button ion-button color="danger" (click)="logoutUser()" full>Log out of this account</button>
+    </ion-item>
+    <ion-item>
+        <ion-label>Joined Community</ion-label>
+        <ion-label>{{(matchDb.communityName | async)}}</ion-label>
+    </ion-item>
+    <ion-item>
+        <ion-label>Member State</ion-label>
+        <ion-label>{{(matchDb.joinState | async)}}</ion-label>
+    </ion-item>
+    <ion-item>
+      <button ion-button (click)="communityListPrompt()" full>Join a Community</button>
+    </ion-item>
+
+    <ion-list-header>Administration</ion-list-header>
+    <ion-item>
+      <button [disabled]="!(authData.profile | async)?.superadmin" ion-button (click)="communityPrompt()" full>Add Community</button>
+    </ion-item>
+    
+  </ion-list>
 </ion-content>

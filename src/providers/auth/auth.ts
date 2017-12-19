@@ -4,6 +4,8 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireObject, QueryFn } from 'angularfire2/database/interfaces';
 import firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+import { OnDestroy } from '@angular/core';
 
 /*
   Generated class for the AuthProvider provider.
@@ -12,32 +14,43 @@ import { Observable } from 'rxjs/Observable';
   and Angular DI.
 */
 @Injectable()
-export class AuthProvider {
+export class AuthProvider implements OnDestroy {
 
-  name: string = "";
-  uid: string = "";
-  community: string = ""; 
+  authState: Observable<firebase.User | null>;
+  profile: Observable<Profile | null>; 
 
   constructor(public afAuth: AngularFireAuth, public afd:AngularFireDatabase) {
+    this.authState = this.afAuth.authState;
+
+    this.profile = Observable.create((observer) => {
+      let profileSub: Subscription;
+      let authSub: Subscription;
+
+      authSub = this.afAuth.authState.subscribe((auth) => {
+        if (auth!=null) {
+          profileSub = this.afd.object<Profile>('/profiles/' + auth.uid).valueChanges().subscribe( (profiles) => {
+            observer.next(profiles);
+          });
+        } else {
+          observer.next(null);
+          profileSub.unsubscribe();
+        }
+      });
+      // Return Unsubscribe function
+      return () => {
+        authSub.unsubscribe();  
+      }
+    });
   }
 
   loginUser(newEmail: string, newPassword: string): Promise<any> {
     return new Promise( (response, reject) => {
       this.afAuth.auth.signInWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
-        this.getProfileData();
-        this.getProfiles(userdata.uid).valueChanges().subscribe( (data) => {
-          if (data!=null) {
-            this.community = data.community;
-          }
-        });
+        // hmm in the end there is nothing to do ...
 
         response(userdata);   
       }, (error) => reject(error));
     });
-  }
-
-  getProfiles(uid: string) : AngularFireObject<Profile> {
-    return this.afd.object('/profiles/' + uid);
   }
 
   resetPassword(email: string): Promise<void> {
@@ -52,9 +65,7 @@ export class AuthProvider {
     return new Promise( (response, reject) => {
       this.afAuth.auth.createUserWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
         this.addProfileData(username);
-        this.name = username;
-        this.uid = userdata.uid;
-        this.afd.list('/profiles').push(new Profile);
+        this.afd.object('/profiles/' + userdata.uid).set(new Profile);
 
         response(userdata);   
       }, (error) => reject(error));
@@ -62,22 +73,19 @@ export class AuthProvider {
   }
 
   addProfileData(name: string) {
-    return this.afAuth.authState.subscribe(auth => {
+    let sub: Subscription = this.afAuth.authState.subscribe(auth => {
       auth.updateProfile({displayName: name, photoURL: null});
+      sub.unsubscribe();
     });
   }
 
-  getProfileData() {
-    return this.afAuth.authState.subscribe(auth => {
-      if (auth!=null) {
-        this.name = auth.displayName;
-      }
-    });
+  ngOnDestroy() {
   }
 }
 
 export class Profile {
   community: string = "";
+  superadmin: boolean = false;
 
   constructor() {
   }
