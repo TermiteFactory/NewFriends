@@ -43,7 +43,7 @@ export class MatchstickDbProvider implements OnDestroy {
         }
         permissionSub.unsubscribe();      
       }
-    });
+    }); 
     // Set the profile with community
     this.communityName = this.afd.object<string>('/communities/' + communityId + '/name').valueChanges();
     this.joinState = this.afd.object<string>('/communities/' + communityId + '/permissions/' + uid).valueChanges();
