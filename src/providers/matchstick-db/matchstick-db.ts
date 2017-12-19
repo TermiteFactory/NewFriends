@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthProvider, Profile } from '../../providers/auth/auth';
+import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireObject, QueryFn } from 'angularfire2/database/interfaces';
 import { Observable } from 'rxjs/Observable';
@@ -24,29 +24,32 @@ export class MatchstickDbProvider implements OnDestroy {
     // Subscribe to profile
     this.profileSub = authData.profile.subscribe( (profile) => {
       if (profile!=null) {
-        if (profile.community != "") {
-          let authSub: Subscription = this.authData.authState.subscribe( (user) => {
-            // user should not be null at this point!
-            this.switchCommunity(profile.community, user.uid);
-            authSub.unsubscribe();
-          });
-        }
+        let authSub: Subscription = this.authData.authState.subscribe( (user) => {
+          // user should not be null at this point!
+          this.switchCommunity(profile.community, user.uid);
+          authSub.unsubscribe();
+        });
       }
     });
   }
   
   switchCommunity(communityId: string, uid: string){
-    let permissionSub: Subscription = this.afd.object('/communities/' + communityId + '/permissions/').valueChanges().subscribe( (state) => {
-      if (state != null) {
-        if (state == 0 || !(uid in state)) {
-          this.afd.object('/communities/' + communityId + '/permissions/' + uid).set("Pending");
+    if (communityId == "") {
+      this.communityName = null;
+      this.joinState = null;
+    } else {
+      let permissionSub: Subscription = this.afd.object('/communities/' + communityId + '/permissions/').valueChanges().subscribe( (state) => {
+        if (state != null) {
+          if (state == 0 || !(uid in state)) {
+            this.afd.object('/communities/' + communityId + '/permissions/' + uid).set("Pending");
+          }
+          permissionSub.unsubscribe();      
         }
-        permissionSub.unsubscribe();      
-      }
-    }); 
-    // Set the profile with community
-    this.communityName = this.afd.object<string>('/communities/' + communityId + '/name').valueChanges();
-    this.joinState = this.afd.object<string>('/communities/' + communityId + '/permissions/' + uid).valueChanges();
+      }); 
+      // Set the profile with community
+      this.communityName = this.afd.object<string>('/communities/' + communityId + '/name').valueChanges();
+      this.joinState = this.afd.object<string>('/communities/' + communityId + '/permissions/' + uid).valueChanges();
+    }
   }
 
   getDetailedListRef(): AngularFireList<any> {
@@ -134,10 +137,9 @@ export class MatchstickDbProvider implements OnDestroy {
   setCommmunity(communityId: string) {
     let authSub: Subscription = this.authData.authState.subscribe( (user) => {
       // user should not be null at this point!
-      this.afd.object<Profile>('/profiles/' + user.uid).update({community: communityId});
+      this.authData.updateCommunity(communityId, user.uid);
       authSub.unsubscribe();
     });
-    
   }
 
   ngOnDestroy() {

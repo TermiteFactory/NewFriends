@@ -79,6 +79,10 @@ export class AuthProvider implements OnDestroy {
     });
   }
 
+  updateCommunity(communityId: string, uid: string) {
+    this.afd.object<Profile>('/profiles/' + uid).update({community: communityId});
+  }
+
   ngOnDestroy() {
   }
 }

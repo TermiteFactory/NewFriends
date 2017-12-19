@@ -76,6 +76,7 @@ export class SettingsPage implements OnDestroy {
         list.forEach((community) => {
           inputList.push({type: 'radio', label: community.name, value: community.key});
         })
+        inputList.push({type: 'radio', label: 'Leave All', value: ""});
         let prompt = this.alertCtrl.create({
           title: 'Select a Community to Join',
           inputs: inputList,
