@@ -21,11 +21,11 @@
     </ion-item>
     <ion-item>
         <ion-label>Joined Community</ion-label>
-        <ion-label>{{(matchDb.communityName | async)}}</ion-label>
+        <ion-label>{{(matchDb.communityState | async)?.communityName}}</ion-label>
     </ion-item>
     <ion-item>
         <ion-label>Member State</ion-label>
-        <ion-label>{{(matchDb.joinState | async)}}</ion-label>
+        <ion-label>{{(matchDb.communityState | async)?.joinState}}</ion-label>
     </ion-item>
     <ion-item>
       <button ion-button (click)="communityListPrompt()" full>Join a Community</button>

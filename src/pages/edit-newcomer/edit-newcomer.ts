@@ -25,7 +25,7 @@ export class EditNewcomerPage implements OnDestroy{
   sub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
-    this.sub = this.matchDb.getDetailedRef(navParams.data.newcomerkey).valueChanges().subscribe( mydata => {
+    this.sub = this.matchDb.getDetailed(navParams.data.newcomerkey).subscribe( mydata => {
       this.db_data = mydata;
       Object.assign(this.local_data, mydata); 
     });

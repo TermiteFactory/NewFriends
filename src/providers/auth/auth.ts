@@ -17,7 +17,7 @@ import { OnDestroy } from '@angular/core';
 export class AuthProvider implements OnDestroy {
 
   authState: Observable<firebase.User | null>;
-  profile: Observable<Profile | null>; 
+  profile: Observable<ProfileUid | null>; 
 
   constructor(public afAuth: AngularFireAuth, public afd:AngularFireDatabase) {
     this.authState = this.afAuth.authState;
@@ -28,8 +28,11 @@ export class AuthProvider implements OnDestroy {
 
       authSub = this.afAuth.authState.subscribe((auth) => {
         if (auth!=null) {
-          profileSub = this.afd.object<Profile>('/profiles/' + auth.uid).valueChanges().subscribe( (profiles) => {
-            observer.next(profiles);
+          profileSub = this.afd.object<Profile>('/profiles/' + auth.uid).valueChanges().subscribe( (profile) => {
+            let profileUid: ProfileUid = new ProfileUid;
+            profileUid.assign(profile);
+            profileUid.uid = auth.uid;
+            observer.next(profileUid);
           });
         } else {
           observer.next(null);
@@ -92,5 +95,18 @@ export class Profile {
   superadmin: boolean = false;
 
   constructor() {
+  }
+}
+
+export class ProfileUid extends Profile {
+  uid: string;
+
+  assign(superClass: Profile) {
+    this.community = superClass.community;
+    this.superadmin = superClass.superadmin
+  }
+
+  constructor() {
+    super();
   }
 }

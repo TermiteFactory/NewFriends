@@ -19,7 +19,9 @@
 
 
 <ion-content padding>
-  <ion-list>
-    <bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [person]=person></bydate-newcomers>
-  </ion-list>
+  <ng-container *ngIf="(matchDb.communityState | async)?.communityName=='Charis'">
+    <ion-list>
+      <bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [person]=person></bydate-newcomers>
+    </ion-list>
+  </ng-container>
 </ion-content>

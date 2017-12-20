@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthProvider } from '../../providers/auth/auth';
+import { AuthProvider, ProfileUid } from '../../providers/auth/auth';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireObject, QueryFn } from 'angularfire2/database/interfaces';
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 
@@ -15,56 +16,80 @@ import { OnDestroy } from '@angular/core';
 */
 @Injectable()
 export class MatchstickDbProvider implements OnDestroy {
+  
+  communityState: BehaviorSubject<JoinData | null>;
 
-  communityName: Observable<string>;
-  joinState: Observable<string>;
-  profileSub: Subscription;
+  private communityStateObservable: Observable<JoinData | null>
+  private profileSub: Subscription;
 
   constructor(public authData: AuthProvider, public afd:AngularFireDatabase) {
-    // Subscribe to profile
-    this.profileSub = authData.profile.subscribe( (profile) => {
-      if (profile!=null) {
-        let authSub: Subscription = this.authData.authState.subscribe( (user) => {
-          // user should not be null at this point!
-          this.switchCommunity(profile.community, user.uid);
-          authSub.unsubscribe();
-        });
+    
+    this.addUidToPermissions();
+    
+    this.communityStateObservable = Observable.create( (observer) => {
+      let stateSub: Subscription = null;
+      let nameSub: Subscription = null;
+      
+      let profileUidSub: Subscription = this.authData.profile.subscribe( (profileUid) => {
+        if (stateSub != null) {
+          stateSub.unsubscribe();
+        }
+        if (nameSub != null) {
+          nameSub.unsubscribe();
+        }
+        if (profileUid.community == "") {
+          observer.next(null);
+        }
+        else {
+          let currentData: JoinData = new JoinData;
+          nameSub = this.afd.object<string>('/communities/' + profileUid.community + '/name').valueChanges().subscribe( (name) => {
+            currentData.communityName = name;
+            observer.next(currentData);
+          });
+          stateSub = this.afd.object<string>('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
+            currentData.joinState = state;
+            observer.next(currentData);
+          });
+        }
+      });
+    });
+
+    this.communityState = new BehaviorSubject(null);
+    this.communityStateObservable.subscribe(this.communityState);
+  }
+
+  // Listens to the change in profiles and will add the uid to the community when necessary 
+  addUidToPermissions() {
+    this.profileSub = this.authData.profile.subscribe( (profileUid) => {
+      // if this is null it means we are logged out
+      if (profileUid!=null) {
+        if (profileUid.community != "") {
+          let permissionSub: Subscription = this.afd.object('/communities/' + profileUid.community + '/permissions/').valueChanges().subscribe( (state) => {
+            if (state != null) {
+              if (state == 0 || !(profileUid.uid in state)) {
+                this.afd.object('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).set("Pending");
+              }
+              permissionSub.unsubscribe();      
+            }
+          }); 
+        }
       }
     });
   }
-  
-  switchCommunity(communityId: string, uid: string){
-    if (communityId == "") {
-      this.communityName = null;
-      this.joinState = null;
-    } else {
-      let permissionSub: Subscription = this.afd.object('/communities/' + communityId + '/permissions/').valueChanges().subscribe( (state) => {
-        if (state != null) {
-          if (state == 0 || !(uid in state)) {
-            this.afd.object('/communities/' + communityId + '/permissions/' + uid).set("Pending");
-          }
-          permissionSub.unsubscribe();      
-        }
-      }); 
-      // Set the profile with community
-      this.communityName = this.afd.object<string>('/communities/' + communityId + '/name').valueChanges();
-      this.joinState = this.afd.object<string>('/communities/' + communityId + '/permissions/' + uid).valueChanges();
-    }
-  }
 
-  getDetailedListRef(): AngularFireList<any> {
+  private getDetailedListRef(): AngularFireList<any> {
     return this.afd.list('/bykey');
   }
 
-  getSummaryListRef(): AngularFireList<any> {
+  private getSummaryListRef(): AngularFireList<any> {
     return this.afd.list('/summary');
   }
 
-  getDetailedRef(detailedKey: string): AngularFireObject<any> {
+  private getDetailedRef(detailedKey: string): AngularFireObject<any> {
     return this.afd.object('/bykey/' + detailedKey);
   }
 
-  getSummaryRef(summaryKey: string): AngularFireObject<any> {
+  private getSummaryRef(summaryKey: string): AngularFireObject<any> {
     return this.afd.object('/summary/' + summaryKey);
   }
 
@@ -121,6 +146,10 @@ export class MatchstickDbProvider implements OnDestroy {
     });
   }
 
+  getDetailed(detailedKey: string) : Observable<any> {
+    return this.getDetailedRef(detailedKey).valueChanges();
+  }
+
   addCommunity(name: string) {
     let community = new Community;
     community.name = name;
@@ -146,6 +175,11 @@ export class MatchstickDbProvider implements OnDestroy {
     this.profileSub.unsubscribe();
   }
   
+}
+
+export class JoinData {
+  communityName: string;
+  joinState: string;
 }
 
 export class Community {
