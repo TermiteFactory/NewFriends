@@ -44,11 +44,16 @@ export class MatchstickDbProvider implements OnDestroy {
           let currentData: JoinData = new JoinData;
           nameSub = this.afd.object<string>('/communities/' + profileUid.community + '/name').valueChanges().subscribe( (name) => {
             currentData.communityName = name;
-            observer.next(currentData);
+            currentData.communityId = profileUid.community;
+            if (currentData.joinState != "Invalid") {
+              observer.next(currentData);
+            }
           });
           stateSub = this.afd.object<string>('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
             currentData.joinState = state;
-            observer.next(currentData);
+            if (currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
+              observer.next(currentData);
+            }
           });
         }
       });
@@ -77,7 +82,7 @@ export class MatchstickDbProvider implements OnDestroy {
     });
   }
 
-  private getDetailedListRef(): AngularFireList<any> {
+  private getDetailedListRef(): AngularFireList<any> | null {
     return this.afd.list('/bykey');
   }
 
@@ -141,8 +146,29 @@ export class MatchstickDbProvider implements OnDestroy {
   }
 
   getSummaryList(queryFn?: QueryFn): Observable<any[]> {
-    return this.afd.list('/summary', queryFn).snapshotChanges().map(changes => {
-      return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+    return Observable.create( (observer) => {
+      let sumSub: Subscription = null;
+      let commSub: Subscription = this.communityState.subscribe( (joinState) => {
+        if (joinState!=null) {
+          sumSub = this.afd.list('/summary', queryFn).snapshotChanges().map(changes => {
+            return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+          }).subscribe( (list) => {
+            observer.next(list);
+          });
+        } else {
+          if (sumSub!=null) {
+            sumSub.unsubscribe();
+          }
+          observer.next([]);
+        }
+      });
+      // Return Unsubscribe function
+      return () => {
+        if (sumSub!=null) {
+          sumSub.unsubscribe();
+        }
+        commSub.unsubscribe();
+      }
     });
   }
 
@@ -178,8 +204,9 @@ export class MatchstickDbProvider implements OnDestroy {
 }
 
 export class JoinData {
-  communityName: string;
-  joinState: string;
+  communityId: string = "Invalid";
+  communityName: string = "Invalid";
+  joinState: string = "Invalid";
 }
 
 export class Community {
