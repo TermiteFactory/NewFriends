@@ -82,28 +82,29 @@ export class MatchstickDbProvider implements OnDestroy {
     });
   }
 
-  private getDetailedListRef(): AngularFireList<any> | null {
-    return this.afd.list('/bykey');
+  private getDetailedListRef(communityId: string): AngularFireList<any> | null {
+    return this.afd.list('/communities/' + communityId + '/data/persons');
   }
 
-  private getSummaryListRef(): AngularFireList<any> {
-    return this.afd.list('/summary');
+  private getSummaryListRef(communityId: string): AngularFireList<any> {
+    return this.afd.list('/communities/' + communityId + '/data/summary');
   }
 
-  private getDetailedRef(detailedKey: string): AngularFireObject<any> {
-    return this.afd.object('/bykey/' + detailedKey);
+  private getDetailedRef(detailedKey: string, communityId: string): AngularFireObject<any> {
+    return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey);
   }
 
-  private getSummaryRef(summaryKey: string): AngularFireObject<any> {
-    return this.afd.object('/summary/' + summaryKey);
+  private getSummaryRef(summaryKey: string, communityId: string): AngularFireObject<any> {
+    return this.afd.object('/communities/' + communityId + '/data/summary/' + summaryKey);
   }
 
   updateData( detailedKey: string, summaryKey: string, data: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
-      this.getDetailedRef(detailedKey).update(data).then(() => {
+      let joinState = this.communityState.getValue();
+      this.getDetailedRef(detailedKey, joinState.communityId).update(data).then(() => {
         let summarydata = new SummaryData;
         this.copyToSummary(data, summarydata);
-        this.getSummaryRef(summaryKey).update(summarydata).then( () => {
+        this.getSummaryRef(summaryKey, joinState.communityId).update(summarydata).then( () => {
           resolve();
         }, () => reject);
       }, () => reject);    
@@ -112,11 +113,12 @@ export class MatchstickDbProvider implements OnDestroy {
 
   addData(detailData: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
-      this.getDetailedListRef().push(detailData).then( pushRtn => {
+      let joinState = this.communityState.getValue();
+      this.getDetailedListRef(joinState.communityId).push(detailData).then( pushRtn => {
         let summary = new SummaryDataKey;
         this.copyToSummary(detailData, summary);
         summary.details_key = pushRtn.key;
-        this.getSummaryListRef().push(summary).then( () => {
+        this.getSummaryListRef(joinState.communityId).push(summary).then( () => {
           resolve();
         }, () => reject() );
       }, () => reject() );
@@ -125,8 +127,9 @@ export class MatchstickDbProvider implements OnDestroy {
 
   deleteData( detailedKey: string, summaryKey: string) : Promise<void> {
     return new Promise( (resolve, reject) => {
-      this.getDetailedRef(detailedKey).remove().then ( () => {
-        this.getSummaryRef(summaryKey).remove().then ( () => {
+      let joinState = this.communityState.getValue();
+      this.getDetailedRef(detailedKey, joinState.communityId).remove().then ( () => {
+        this.getSummaryRef(summaryKey, joinState.communityId).remove().then ( () => {
           resolve();
         }, () => reject() );
       }, () => reject() );
@@ -150,7 +153,7 @@ export class MatchstickDbProvider implements OnDestroy {
       let sumSub: Subscription = null;
       let commSub: Subscription = this.communityState.subscribe( (joinState) => {
         if (joinState!=null) {
-          sumSub = this.afd.list('/summary', queryFn).snapshotChanges().map(changes => {
+          sumSub = this.afd.list('/communities/' + joinState.communityId + '/data/summary', queryFn).snapshotChanges().map(changes => {
             return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
           }).subscribe( (list) => {
             observer.next(list);
@@ -177,7 +180,7 @@ export class MatchstickDbProvider implements OnDestroy {
       let detailedSub: Subscription = null;
       let commSub: Subscription = this.communityState.subscribe( (joinState) => {
         if (joinState!=null) {
-          detailedSub = this.getDetailedRef(detailedKey).valueChanges().subscribe( (detailed) => {
+          detailedSub = this.getDetailedRef(detailedKey, joinState.communityId).valueChanges().subscribe( (detailed) => {
             observer.next(detailed);
           });
         } else {
