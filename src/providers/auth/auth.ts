@@ -6,6 +6,7 @@ import firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 /*
   Generated class for the AuthProvider provider.
@@ -16,13 +17,16 @@ import { OnDestroy } from '@angular/core';
 @Injectable()
 export class AuthProvider implements OnDestroy {
 
-  authState: Observable<firebase.User | null>;
-  profile: Observable<ProfileUid | null>; 
+  authState: BehaviorSubject<firebase.User | null>;
+  profile: BehaviorSubject<ProfileUid | null>; 
+
+  private profileObservable: Observable<ProfileUid | null>; 
 
   constructor(public afAuth: AngularFireAuth, public afd:AngularFireDatabase) {
-    this.authState = this.afAuth.authState;
+    this.authState = new BehaviorSubject(null);
+    this.afAuth.authState.subscribe(this.authState);
 
-    this.profile = Observable.create((observer) => {
+    this.profileObservable = Observable.create((observer) => {
       let profileSub: Subscription;
       let authSub: Subscription;
 
@@ -36,7 +40,10 @@ export class AuthProvider implements OnDestroy {
           });
         } else {
           observer.next(null);
-          profileSub.unsubscribe();
+          
+          if (profileSub!=null) {
+            profileSub.unsubscribe();
+          }
         }
       });
       // Return Unsubscribe function
@@ -44,6 +51,8 @@ export class AuthProvider implements OnDestroy {
         authSub.unsubscribe();  
       }
     });
+    this.profile = new BehaviorSubject(null);
+    this.profileObservable.subscribe(this.profile);
   }
 
   loginUser(newEmail: string, newPassword: string): Promise<any> {

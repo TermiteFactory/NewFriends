@@ -37,7 +37,7 @@ export class MatchstickDbProvider implements OnDestroy {
         if (nameSub != null) {
           nameSub.unsubscribe();
         }
-        if (profileUid.community == "") {
+        if (profileUid == null || profileUid.community == "") {
           observer.next(null);
         }
         else {
@@ -54,7 +54,7 @@ export class MatchstickDbProvider implements OnDestroy {
             if (currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
               observer.next(currentData);
             }
-          });
+          }); 
         }
       });
     });
@@ -113,7 +113,7 @@ export class MatchstickDbProvider implements OnDestroy {
   addData(detailData: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
       this.getDetailedListRef().push(detailData).then( pushRtn => {
-        let summary: SummaryDataKey = new SummaryDataKey;
+        let summary = new SummaryDataKey;
         this.copyToSummary(detailData, summary);
         summary.details_key = pushRtn.key;
         this.getSummaryListRef().push(summary).then( () => {
@@ -173,7 +173,28 @@ export class MatchstickDbProvider implements OnDestroy {
   }
 
   getDetailed(detailedKey: string) : Observable<any> {
-    return this.getDetailedRef(detailedKey).valueChanges();
+    return Observable.create( (observer) => {
+      let detailedSub: Subscription = null;
+      let commSub: Subscription = this.communityState.subscribe( (joinState) => {
+        if (joinState!=null) {
+          detailedSub = this.getDetailedRef(detailedKey).valueChanges().subscribe( (detailed) => {
+            observer.next(detailed);
+          });
+        } else {
+          if (detailedSub!=null) {
+            detailedSub.unsubscribe();
+          }
+          observer.next(new DetailedData);
+        }
+      });
+      // Unsubscribe callback
+      return () => {
+        if (detailedSub!=null) {
+          detailedSub.unsubscribe();
+        } 
+      }
+    });
+    
   }
 
   addCommunity(name: string) {
@@ -190,11 +211,10 @@ export class MatchstickDbProvider implements OnDestroy {
   }
 
   setCommmunity(communityId: string) {
-    let authSub: Subscription = this.authData.authState.subscribe( (user) => {
-      // user should not be null at this point!
-      this.authData.updateCommunity(communityId, user.uid);
-      authSub.unsubscribe();
-    });
+    let user = this.authData.authState.getValue();
+    
+    // user should not be null at this point!
+    this.authData.updateCommunity(communityId, user.uid);
   }
 
   ngOnDestroy() {
