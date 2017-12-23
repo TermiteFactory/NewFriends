@@ -61,6 +61,7 @@ export class NewcomerDetailsPage implements OnDestroy {
         {
           text: 'Save',
           handler: data => {
+            
             console.log('Saved clicked');
           }
         }

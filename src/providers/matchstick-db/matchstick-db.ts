@@ -82,7 +82,7 @@ export class MatchstickDbProvider implements OnDestroy {
     });
   }
 
-  private getDetailedListRef(communityId: string): AngularFireList<any> | null {
+  private getPersonListRef(communityId: string): AngularFireList<any> | null {
     return this.afd.list('/communities/' + communityId + '/data/persons');
   }
 
@@ -90,18 +90,26 @@ export class MatchstickDbProvider implements OnDestroy {
     return this.afd.list('/communities/' + communityId + '/data/summary');
   }
 
-  private getDetailedRef(detailedKey: string, communityId: string): AngularFireObject<any> {
+  private getPersonRef(detailedKey: string, communityId: string): AngularFireObject<any> {
     return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey);
+  }
+
+  private getPersonDetailsRef(detailedKey: string, communityId: string): AngularFireObject<any> {
+    return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey + '/details');
   }
 
   private getSummaryRef(summaryKey: string, communityId: string): AngularFireObject<any> {
     return this.afd.object('/communities/' + communityId + '/data/summary/' + summaryKey);
   }
+  
+  private getPersonNotesRef(detailedKey: string, communityId: string) {
+    return this.afd.list('/communities/' + communityId + '/data/persons/' + detailedKey + '/notes')
+  }
 
   updateData( detailedKey: string, summaryKey: string, data: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
       let joinState = this.communityState.getValue();
-      this.getDetailedRef(detailedKey, joinState.communityId).update(data).then(() => {
+      this.getPersonDetailsRef(detailedKey, joinState.communityId).update(data).then(() => {
         let summarydata = new SummaryData;
         this.copyToSummary(data, summarydata);
         this.getSummaryRef(summaryKey, joinState.communityId).update(summarydata).then( () => {
@@ -110,11 +118,21 @@ export class MatchstickDbProvider implements OnDestroy {
       }, () => reject);    
     });    
   }
+  
+  addComment(comment: string, date: string) {
+    let joinState = this.communityState.getValue();
+    joinState.communityId;
+    let auth = this.authData.authState.getValue();
+    auth.displayName
+
+  }
 
   addData(detailData: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
       let joinState = this.communityState.getValue();
-      this.getDetailedListRef(joinState.communityId).push(detailData).then( pushRtn => {
+      let person = new Person;
+      person.details = detailData;
+      this.getPersonListRef(joinState.communityId).push(person).then( pushRtn => {
         let summary = new SummaryDataKey;
         this.copyToSummary(detailData, summary);
         summary.details_key = pushRtn.key;
@@ -128,7 +146,7 @@ export class MatchstickDbProvider implements OnDestroy {
   deleteData( detailedKey: string, summaryKey: string) : Promise<void> {
     return new Promise( (resolve, reject) => {
       let joinState = this.communityState.getValue();
-      this.getDetailedRef(detailedKey, joinState.communityId).remove().then ( () => {
+      this.getPersonRef(detailedKey, joinState.communityId).remove().then ( () => {
         this.getSummaryRef(summaryKey, joinState.communityId).remove().then ( () => {
           resolve();
         }, () => reject() );
@@ -177,19 +195,11 @@ export class MatchstickDbProvider implements OnDestroy {
 
   getDetailed(detailedKey: string) : Observable<any> {
     return Observable.create( (observer) => {
-      let detailedSub: Subscription = null;
-      let commSub: Subscription = this.communityState.subscribe( (joinState) => {
-        if (joinState!=null) {
-          detailedSub = this.getDetailedRef(detailedKey, joinState.communityId).valueChanges().subscribe( (detailed) => {
-            observer.next(detailed);
-          });
-        } else {
-          if (detailedSub!=null) {
-            detailedSub.unsubscribe();
-          }
-          observer.next(new DetailedData);
-        }
-      });
+      let joinState = this.communityState.getValue();
+      // Register for the detailed state to get updates
+      let detailedSub = this.getPersonDetailsRef(detailedKey, joinState.communityId).valueChanges().subscribe( (detailed) => {
+        observer.next(detailed);
+      });        
       // Unsubscribe callback
       return () => {
         if (detailedSub!=null) {
@@ -197,7 +207,21 @@ export class MatchstickDbProvider implements OnDestroy {
         } 
       }
     });
-    
+  }
+
+  getNotes(detailedKey: string) : Observable<any[]> {
+    return Observable.create( (observer) => {
+      let joinState = this.communityState.getValue();
+      let notesSub = this.getPersonNotesRef(detailedKey, joinState.communityId).valueChanges().subscribe( (notes) => {
+        observer.next(notes);
+      });
+      // Unsubscribe callback
+      return () => {
+        if (notesSub!=null) {
+          notesSub.unsubscribe();
+        } 
+      }
+    });
   }
 
   addCommunity(name: string) {
@@ -259,6 +283,14 @@ export class SummaryDataKey extends SummaryData {
 
   constructor() {
     super();
+  }
+}
+
+export class Person {
+  details: DetailedData = new DetailedData;
+  notes: 0;
+  
+  constructor() {
   }
 }
 
