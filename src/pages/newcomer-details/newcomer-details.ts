@@ -3,7 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { AlertController } from 'ionic-angular';
-import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, DetailedData, Note } from '../../providers/matchstick-db/matchstick-db';
 
 /**
  * Generated class for the NewcomerDetailsPage page.
@@ -20,12 +20,18 @@ import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-d
 export class NewcomerDetailsPage implements OnDestroy {
 
   local_data: DetailedData = new DetailedData;
-  sub: Subscription;
+  notes: Note[] = [];
+
+  detailSub: Subscription;
+  notesSub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
     public alertCtrl: AlertController) {
-      this.sub = this.matchDb.getDetailed(navParams.data.newcomerkey).subscribe( data => {
+      this.detailSub = this.matchDb.getDetailed(navParams.data.newcomerkey).subscribe( data => {
         this.local_data = data; 
+      });
+      this.notesSub = this.matchDb.getNotes(navParams.data.newcomerkey).subscribe( data => {
+        this.notes = data;
       });
   }
 
@@ -39,7 +45,7 @@ export class NewcomerDetailsPage implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.detailSub.unsubscribe();
   }
 
   commentPrompt() {
@@ -61,7 +67,8 @@ export class NewcomerDetailsPage implements OnDestroy {
         {
           text: 'Save',
           handler: data => {
-            
+            let today = new Date;
+            this.matchDb.addNote(this.navParams.data.newcomerkey, data.comment, today.toISOString());
             console.log('Saved clicked');
           }
         }

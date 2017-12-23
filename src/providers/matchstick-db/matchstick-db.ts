@@ -119,12 +119,14 @@ export class MatchstickDbProvider implements OnDestroy {
     });    
   }
   
-  addComment(comment: string, date: string) {
+  addNote(detailedKey: string, comment: string, date: string) {
     let joinState = this.communityState.getValue();
-    joinState.communityId;
     let auth = this.authData.authState.getValue();
-    auth.displayName
-
+    let note = new Note;
+    note.date = date;
+    note.name = auth.displayName;
+    note.text = comment;
+    this.getPersonNotesRef(detailedKey, joinState.communityId).push(note);
   }
 
   addData(detailData: DetailedData): Promise<void> {
@@ -273,6 +275,15 @@ export class SummaryData {
   tag_cvl: boolean = false;
   tag_pastor: boolean = false;
   tag_nocontact: boolean = false;
+
+  constructor() {
+  }
+}
+
+export class Note {
+  name: string = "";
+  date: string = "";
+  text: string = "";
 
   constructor() {
   }

@@ -17,6 +17,9 @@
 </ion-header>
 <ion-content padding>
   <ion-card>
+    <ion-card-header>
+      Details
+    </ion-card-header>
     <ion-card-content>
       <ion-list>
         <ion-item>
@@ -58,5 +61,30 @@
       </ion-list>
     </ion-card-content>
   </ion-card>
+
+  <ion-card *ngFor="let note of notes">
+    <ion-card-content>
+      <p>{{note.text}}</p>
+    </ion-card-content>
+    <ion-row>
+        <ion-col center text-center>
+          <ion-note>
+            {{note.name}}
+          </ion-note>
+        </ion-col>
+        <ion-col center text-center>
+          <ion-note>
+            {{note.date}}
+          </ion-note>
+        </ion-col>
+        <ion-col>
+            <button ion-button icon-left clear small>
+              <ion-icon name="trash"></ion-icon>
+              <div>Delete</div>
+            </button>
+          </ion-col>
+      </ion-row>
+  </ion-card>
+
   <button ion-button (click)="commentPrompt()" full>Add Followup Comment</button>
 </ion-content>
