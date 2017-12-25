@@ -1,11 +1,14 @@
 import { NgModule } from '@angular/core';
 import { ReversePipe } from './reverse/reverse';
 import { HeadersPipe } from './headers/headers';
+import {TimeAgoPipe} from 'time-ago-pipe/time-ago-pipe';
 @NgModule({
 	declarations: [ReversePipe,
-    HeadersPipe],
+		HeadersPipe,
+		TimeAgoPipe],
 	imports: [],
 	exports: [ReversePipe,
-    HeadersPipe]
+		HeadersPipe,
+		TimeAgoPipe]
 })
 export class PipesModule {}

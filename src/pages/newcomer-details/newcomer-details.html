@@ -74,17 +74,29 @@
         </ion-col>
         <ion-col center text-center>
           <ion-note>
-            {{note.date}}
+            {{note.date | timeAgo}}
           </ion-note>
         </ion-col>
         <ion-col>
-            <button ion-button icon-left clear small>
-              <ion-icon name="trash"></ion-icon>
-              <div>Delete</div>
-            </button>
+            <ion-buttons end>
+              <button ion-button icon-left clear small>
+                <ion-icon name="create"></ion-icon>
+                <div>Edit</div>
+              </button>
+            </ion-buttons>
           </ion-col>
       </ion-row>
   </ion-card>
 
-  <button ion-button (click)="commentPrompt()" full>Add Followup Comment</button>
+  <ion-card>
+      <ion-card-content>
+        <ion-textarea #commentElement placeholder="Type in followup comments here" clearInput="true" type="text"></ion-textarea>
+      </ion-card-content>
+      <ion-buttons end>
+          <button ion-button icon-left clear small (click)="submitComment(commentElement)">
+              <ion-icon name="send"></ion-icon>
+              <div>Submit</div>
+            </button>
+      </ion-buttons>
+  </ion-card>
 </ion-content>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, TextInput } from 'ionic-angular';
 import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { AlertController } from 'ionic-angular';
@@ -48,33 +48,12 @@ export class NewcomerDetailsPage implements OnDestroy {
     this.detailSub.unsubscribe();
   }
 
-  commentPrompt() {
-    let prompt = this.alertCtrl.create({
-      title: 'Comment',
-      inputs: [
-        {
-          name: 'comment',
-          placeholder: 'Comment'
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          handler: data => {
-            console.log('Cancel clicked');
-          }
-        },
-        {
-          text: 'Save',
-          handler: data => {
-            let today = new Date;
-            this.matchDb.addNote(this.navParams.data.newcomerkey, data.comment, today.toISOString());
-            console.log('Saved clicked');
-          }
-        }
-      ]
-    });
-    prompt.present();
+  submitComment(textArea: TextInput) {
+    if (textArea.value != "") {
+      let today = new Date;
+      this.matchDb.addNote(this.navParams.data.newcomerkey, textArea.value, today.toISOString());
+      textArea.clearTextInput();
+    }
   }
 
 }
