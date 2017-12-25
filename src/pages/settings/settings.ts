@@ -1,10 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
-import { LoginPage } from '../login/login';
-import {App} from 'ionic-angular';
-import firebase from 'firebase/app';
-import { Observable } from 'rxjs/Observable';
+import { App } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
 import { MatchstickDbProvider, Community } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';

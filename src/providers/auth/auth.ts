@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
-import { AngularFireObject, QueryFn } from 'angularfire2/database/interfaces';
+import { AngularFireDatabase } from 'angularfire2/database';
 import firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';

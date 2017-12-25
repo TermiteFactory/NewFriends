@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthProvider, ProfileUid } from '../../providers/auth/auth';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
@@ -57,6 +56,9 @@ export class MatchstickDbProvider implements OnDestroy {
           }); 
         }
       });
+      return () => {
+        profileUidSub.unsubscribe();
+      };
     });
 
     this.communityState = new BehaviorSubject(null);
@@ -126,6 +128,7 @@ export class MatchstickDbProvider implements OnDestroy {
     note.date = date;
     note.name = auth.displayName;
     note.text = comment;
+    note.uid = auth.uid;
     this.getPersonNotesRef(detailedKey, joinState.communityId).push(note);
   }
 
@@ -214,7 +217,9 @@ export class MatchstickDbProvider implements OnDestroy {
   getNotes(detailedKey: string) : Observable<any[]> {
     return Observable.create( (observer) => {
       let joinState = this.communityState.getValue();
-      let notesSub = this.getPersonNotesRef(detailedKey, joinState.communityId).valueChanges().subscribe( (notes) => {
+      let notesSub = this.getPersonNotesRef(detailedKey, joinState.communityId).snapshotChanges().map(changes => {
+        return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+      }).subscribe( (notes) => {
         observer.next(notes);
       });
       // Unsubscribe callback
@@ -284,6 +289,7 @@ export class Note {
   name: string = "";
   date: string = "";
   text: string = "";
+  uid: string = "";
 
   constructor() {
   }

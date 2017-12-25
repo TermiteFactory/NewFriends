@@ -63,10 +63,11 @@
   </ion-card>
 
   <ion-card *ngFor="let note of notes">
-    <ion-card-content>
-      <p>{{note.text}}</p>
-    </ion-card-content>
-    <ion-row>
+    <ng-container *ngIf="(editNoteKey | async) != note.key">
+      <ion-card-content>
+        <p>{{note.text}}</p>
+      </ion-card-content>
+      <ion-row>
         <ion-col center text-center>
           <ion-note>
             {{note.name}}
@@ -78,14 +79,35 @@
           </ion-note>
         </ion-col>
         <ion-col>
-            <ion-buttons end>
-              <button ion-button icon-left clear small>
-                <ion-icon name="create"></ion-icon>
-                <div>Edit</div>
-              </button>
-            </ion-buttons>
-          </ion-col>
+          <ion-buttons end>
+            <button ion-button icon-left clear small (click)="editNote(note)">
+              <ion-icon name="create"></ion-icon>
+              <div>Edit</div>
+            </button>
+          </ion-buttons>
+        </ion-col>
       </ion-row>
+    </ng-container>
+
+    <ng-container *ngIf="(editNoteKey | async) == note.key">
+      <ion-card-content>
+        <ion-textarea #editElement clearInput="true" type="text" [ngModel]="note.text"></ion-textarea>
+      </ion-card-content>
+      <ion-row>
+        <ion-col center text-center>
+          <button ion-button icon-left clear small (click)="deleteNote(editElement)">
+            <ion-icon name="trash"></ion-icon>
+            <div>Delete</div>
+          </button>
+        </ion-col>
+        <ion-col>
+          <button ion-button icon-left clear small (click)="modifyNote(editElement)">
+            <ion-icon name="send"></ion-icon>
+            <div>Modify</div>
+          </button>
+        </ion-col>
+      </ion-row>
+    </ng-container>
   </ion-card>
 
   <ion-card>
@@ -93,7 +115,7 @@
         <ion-textarea #commentElement placeholder="Type in followup comments here" clearInput="true" type="text"></ion-textarea>
       </ion-card-content>
       <ion-buttons end>
-          <button ion-button icon-left clear small (click)="submitComment(commentElement)">
+          <button ion-button icon-left clear small (click)="submitNote(commentElement)">
               <ion-icon name="send"></ion-icon>
               <div>Submit</div>
             </button>
