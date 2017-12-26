@@ -20,15 +20,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AuthProvider } from '../providers/auth/auth';
 import { MatchstickDbProvider } from '../providers/matchstick-db/matchstick-db';
+import { firebaseConfig } from './firebaseconfig';
 
-export const firebaseConfig = {
-    apiKey: "AIzaSyAzZg3R8ulG2jfqAOlemmG9gZ_YeexvZhI",
-    authDomain: "match-f21a7.firebaseapp.com",
-    databaseURL: "https://match-f21a7.firebaseio.com",
-    projectId: "match-f21a7",
-    storageBucket: "match-f21a7.appspot.com",
-    messagingSenderId: "770536684275"
-};
 
 @NgModule({
   declarations: [
