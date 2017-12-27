@@ -104,8 +104,12 @@ export class MatchstickDbProvider implements OnDestroy {
     return this.afd.object('/communities/' + communityId + '/data/summary/' + summaryKey);
   }
   
-  private getPersonNotesRef(detailedKey: string, communityId: string) {
+  private getPersonNotesRef(detailedKey: string, communityId: string): AngularFireList<any> {
     return this.afd.list('/communities/' + communityId + '/data/persons/' + detailedKey + '/notes')
+  }
+
+  private getPersonSingleNoteRef(detailedKey: string, communityId: string, noteId: string): AngularFireObject<any> {
+    return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey + '/notes/' + noteId);
   }
 
   updateData( detailedKey: string, summaryKey: string, data: DetailedData): Promise<void> {
@@ -249,6 +253,22 @@ export class MatchstickDbProvider implements OnDestroy {
     
     // user should not be null at this point!
     this.authData.updateCommunity(communityId, user.uid);
+  }
+
+  modifyNote(detailedKey: string, text: string, noteId: string): Promise<void> {
+    return new Promise( (resolve, reject) => {
+      let joinState = this.communityState.getValue();
+      this.getPersonSingleNoteRef(detailedKey, joinState.communityId, noteId).update({text: text}).then( 
+        ()=> resolve(), ()=> reject());
+    });
+  }
+
+  deleteNote(detailedKey: string, noteId: string): Promise<void> {
+    return new Promise( (resolve, reject) => {
+      let joinState = this.communityState.getValue();
+      this.getPersonSingleNoteRef(detailedKey, joinState.communityId, noteId).remove().then( 
+        ()=> resolve(), ()=> reject());
+    });
   }
 
   ngOnDestroy() {

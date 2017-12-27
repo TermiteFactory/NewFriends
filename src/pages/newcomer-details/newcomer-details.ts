@@ -60,11 +60,13 @@ export class NewcomerDetailsPage implements OnDestroy {
     }
   }
 
-  deleteNote(textArea: TextInput) {
+  deleteNote(key: string) {
+    this.matchDb.deleteNote(this.navParams.data.newcomerkey, key);
     this.editNoteKey.next("");
   }
 
-  modifyNote(textArea: TextInput) {
+  modifyNote(textArea: TextInput, key: string) {
+    this.matchDb.modifyNote(this.navParams.data.newcomerkey, textArea.value, key);
     this.editNoteKey.next("");
   }
 

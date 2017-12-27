@@ -95,13 +95,13 @@
       </ion-card-content>
       <ion-row>
         <ion-col center text-center>
-          <button ion-button icon-left clear small (click)="deleteNote(editElement)">
+          <button ion-button icon-left clear small (click)="deleteNote(note.key)">
             <ion-icon name="trash"></ion-icon>
             <div>Delete</div>
           </button>
         </ion-col>
         <ion-col>
-          <button ion-button icon-left clear small (click)="modifyNote(editElement)">
+          <button ion-button icon-left clear small (click)="modifyNote(editElement, note.key)">
             <ion-icon name="send"></ion-icon>
             <div>Modify</div>
           </button>
