@@ -91,7 +91,9 @@
 
     <ng-container *ngIf="(editNoteKey | async) == note.key">
       <ion-card-content>
-        <ion-textarea #editElement clearInput="true" type="text" [ngModel]="note.text"></ion-textarea>
+        <ion-item>
+            <ion-textarea #editElement clearInput="true" type="text" [ngModel]="note.text"></ion-textarea>
+        </ion-item>
       </ion-card-content>
       <ion-row>
         <ion-col center text-center>
@@ -112,7 +114,9 @@
 
   <ion-card>
       <ion-card-content>
-        <ion-textarea #commentElement placeholder="Type in followup comments here" clearInput="true" type="text"></ion-textarea>
+        <ion-item>
+            <ion-textarea #commentElement placeholder="Type in followup comments here" clearInput="true" type="text"></ion-textarea>
+        </ion-item>
       </ion-card-content>
       <ion-buttons end>
           <button ion-button icon-left clear small (click)="submitNote(commentElement)">
