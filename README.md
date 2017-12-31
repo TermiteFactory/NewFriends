@@ -48,7 +48,7 @@ communities
             - persons
                 - <Person ID>
                     - details
-                        ...
+                        ... (Contains details of the person)
                     - notes
                         - <Note ID>
                             - date
@@ -56,6 +56,10 @@ communities
                             - text
                             - uid : Unique Identifier of Profile
             - summary
+                - <Summary ID>
+                    - date: date of joining or addition 
+                    - details_key: Value is the Person ID used by the persons list
+                    ... (more details of the person)
         - name: Value is the name of this community
         - permissions
             - <Profile uid> : Value is Member/Pending/Removed
