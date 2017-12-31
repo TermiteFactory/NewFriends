@@ -16,22 +16,22 @@
 <ion-content padding>
   <ion-list>
     <ion-item>
-        <ion-label stacked>Name</ion-label>
+        <ion-label color="primary" stacked>Name</ion-label>
         <ion-input  type="text" [(ngModel)]="local_data.name"></ion-input>
     </ion-item>
 
     <ion-item>
-        <ion-label stacked>Visited On</ion-label>
+        <ion-label color="primary" stacked>Visited On</ion-label>
         <ion-datetime  displayFormat="DDD D MMM YYYY" pickerFormat="D MMM YYYY" [(ngModel)]="local_data.dateVisited"></ion-datetime>
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Came With</ion-label>
+      <ion-label color="primary" stacked>Came With</ion-label>
       <ion-input  type="text" [(ngModel)]="local_data.cameWith"></ion-input>
     </ion-item>
     
     <ion-item>
-      <ion-label>Age</ion-label>
+      <ion-label color="primary" >Age</ion-label>
       <ion-select  interface="popover" [(ngModel)]="local_data.age">
         <ion-option value="7-15">7-15</ion-option>
         <ion-option value="16-23">16-23</ion-option>
@@ -42,17 +42,17 @@
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Phone</ion-label>
+      <ion-label color="primary" stacked>Phone</ion-label>
       <ion-input  type="tel" [(ngModel)]="local_data.phone"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Email</ion-label>
+      <ion-label color="primary" stacked>Email</ion-label>
       <ion-input  type="email" [(ngModel)]="local_data.email"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label>Religion</ion-label>
+      <ion-label color="primary" >Religion</ion-label>
       <ion-select  interface="popover" [(ngModel)]="local_data.religion">
         <ion-option value="Christian">Christian</ion-option>
         <ion-option value="Free-Thinker">Free-Thinker</ion-option>
@@ -61,7 +61,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Purpose for Visit</ion-label>
+      <ion-label color="primary" stacked>Purpose for Visit</ion-label>
       <ion-select  interface="popover" [(ngModel)]="local_data.purpose">
         <ion-option value="None">None</ion-option>
         <ion-option value="Finding a Church">Finding a Church</ion-option>
@@ -70,7 +70,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Visited Before?</ion-label>
+      <ion-label color="primary" stacked>Visited Before?</ion-label>
       <ion-select  interface="popover" [(ngModel)]="local_data.visitedBefore">
         <ion-option value="First Time">First Time</ion-option>
         <ion-option value="Another Service">Another Service</ion-option>

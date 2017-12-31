@@ -14,13 +14,13 @@
 
 
 <ion-content padding>
-  <ng-container *ngIf="(matchDb.communityState | async)==null">
+  <ng-container *ngIf="(matchDb.communityState | async)==null || (matchDb.communityState | async).joinState!='Member'">
     <h2>Welcome to the New Friends App!</h2>
     <p>
       Please Join a Community to see your New comers!
     </p>
   </ng-container>
-  <ng-container *ngIf="(matchDb.communityState | async)!=null">
+  <ng-container *ngIf="(matchDb.communityState | async) !=null && (matchDb.communityState | async).joinState=='Member'">
     <ion-list>
       <ion-item *ngFor="let group of groupsListing" (click)="showGroupList(group.tag, group.label)" detail-push>  
         {{group.label}}

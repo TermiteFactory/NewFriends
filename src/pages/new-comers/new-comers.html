@@ -19,13 +19,13 @@
 
 
 <ion-content padding>
-  <ng-container *ngIf="(matchDb.communityState | async)==null || (matchDb.communityState | async).joinState=='Pending'">
+  <ng-container *ngIf="(matchDb.communityState | async)==null || (matchDb.communityState | async).joinState!='Member'">
     <h2>Welcome to the New Friends App!</h2>
     <p>
       Please Join a Community to see your New comers!
     </p>
   </ng-container>
-  <ng-container *ngIf="(matchDb.communityState | async) !=null && (matchDb.communityState | async).joinState!='Pending'">
+  <ng-container *ngIf="(matchDb.communityState | async) !=null && (matchDb.communityState | async).joinState=='Member'">
     <ion-list>
       <bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [person]=person></bydate-newcomers>
     </ion-list>
