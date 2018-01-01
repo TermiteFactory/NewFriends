@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, TextInput } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, TextInput, LoadingController } from 'ionic-angular';
 import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -24,16 +24,37 @@ export class NewcomerDetailsPage implements OnDestroy {
   notes: any[] = [];
   editNoteKey: BehaviorSubject<string>;
 
+  detailRtn: boolean = false;
+  notesRtn: boolean = false;
+
   detailSub: Subscription;
   notesSub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
-    public alertCtrl: AlertController) {
+    public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+
+      let loading = this.loadingCtrl.create({
+        content: 'Please wait...'
+      });
+      loading.present();
+
       this.detailSub = this.matchDb.getDetailed(navParams.data.newcomerkey).subscribe( data => {
-        this.local_data = data; 
+        if (data!=null) {
+          this.local_data = data; 
+          this.detailRtn = true;
+          if (this.notesRtn==true) {
+            loading.dismiss();
+          }
+        }
       });
       this.notesSub = this.matchDb.getNotes(navParams.data.newcomerkey).subscribe( data => {
-        this.notes = data;
+        if (data != null) {
+          this.notes = data;
+          this.notesRtn = true;
+          if (this.detailRtn==true) {
+            loading.dismiss();
+          }
+        }
       });
 
       this.editNoteKey = new BehaviorSubject("");

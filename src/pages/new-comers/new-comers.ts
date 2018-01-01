@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, LoadingController } from 'ionic-angular';
 import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
@@ -21,10 +21,18 @@ export class NewComersPage implements OnDestroy {
   searchTerm: string = '';
   sub: Subscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
+    public loadingCtrl: LoadingController) {
+    
+    let loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+    loading.present();
+
     this.sub = matchDb.getSummaryList(ref=>ref.orderByChild("date")).subscribe( data => {
         this.originalSummaryList = data;
         this.setFilteredItems();
+        loading.dismiss();
      });
   }
 

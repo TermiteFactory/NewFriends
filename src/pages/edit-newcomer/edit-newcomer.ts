@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, Loading } from 'ionic-angular';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-db/matchstick-db';
@@ -21,10 +21,18 @@ export class EditNewcomerPage implements OnDestroy{
   local_data: DetailedData = new DetailedData;
   sub: Subscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
+    public loadingCtrl: LoadingController) {
+    
+    let loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+    loading.present();
+
     this.sub = this.matchDb.getDetailed(navParams.data.newcomerkey).subscribe( mydata => {
       this.db_data = mydata;
       Object.assign(this.local_data, mydata); 
+      loading.dismiss();
     });
   }
 

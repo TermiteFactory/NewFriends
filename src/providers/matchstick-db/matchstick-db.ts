@@ -178,9 +178,9 @@ export class MatchstickDbProvider implements OnDestroy {
   getSummaryList(queryFn?: QueryFn): Observable<any[]> {
     return Observable.create( (observer) => {
       let sumSub: Subscription = null;
-      let commSub: Subscription = this.communityState.subscribe( (joinState) => {
-        if (joinState!=null) {
-          sumSub = this.afd.list('/communities/' + joinState.communityId + '/data/summary', queryFn).snapshotChanges().map(changes => {
+      let commSub: Subscription = this.communityState.subscribe( (state) => {
+        if (state!=null && state.joinState=="Member") {
+          sumSub = this.afd.list('/communities/' + state.communityId + '/data/summary', queryFn).snapshotChanges().map(changes => {
             return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
           }).subscribe( (list) => {
             observer.next(list);
