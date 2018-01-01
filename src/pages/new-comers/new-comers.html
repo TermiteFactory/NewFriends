@@ -8,11 +8,9 @@
 
   <ion-navbar>
     <ion-title>New Friends!</ion-title>
-    <ng-container *ngIf="(matchDb.communityState | async) !=null && (matchDb.communityState | async).joinState=='Member'">
-      <ion-buttons end>
-        <button ion-button icon-left (click)="addNewcomer()"><ion-icon name="add"></ion-icon>Add</button>
-      </ion-buttons>
-    </ng-container>
+    <ion-buttons *ngIf="(matchDb.communityState | async) !=null && (matchDb.communityState | async).joinState=='Member'" end>
+      <button ion-button icon-left (click)="addNewcomer()"><ion-icon name="add"></ion-icon>Add</button>
+    </ion-buttons>
   </ion-navbar>
   <ion-toolbar>
     <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="setFilteredItems()"></ion-searchbar>
