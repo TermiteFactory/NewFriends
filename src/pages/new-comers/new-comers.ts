@@ -32,7 +32,11 @@ export class NewComersPage implements OnDestroy {
     this.sub = matchDb.getSummaryList(ref=>ref.orderByChild("date")).subscribe( data => {
         this.originalSummaryList = data;
         this.setFilteredItems();
-        loading.dismiss();
+        
+        if (loading!=null) {
+          loading.dismiss();
+          loading = null;
+        }
      });
   }
 

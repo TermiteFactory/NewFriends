@@ -78,14 +78,16 @@
             {{note.date | timeAgo}}
           </ion-note>
         </ion-col>
-        <ion-col>
-          <ion-buttons end>
-            <button ion-button icon-left clear small (click)="editNote(note)">
-              <ion-icon name="create"></ion-icon>
-              <div>Edit</div>
-            </button>
-          </ion-buttons>
-        </ion-col>
+        <ng-container *ngIf="(authData.profile | async)?.uid == note.uid">
+          <ion-col>
+            <ion-buttons end>
+              <button ion-button icon-left clear small (click)="editNote(note)">
+                <ion-icon name="create"></ion-icon>
+                <div>Edit</div>
+              </button>
+            </ion-buttons>
+          </ion-col>
+        </ng-container>
       </ion-row>
     </ng-container>
 

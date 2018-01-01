@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, LoadingController } from 'ionic-angular';
 import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
@@ -30,7 +30,14 @@ export class GroupsPage implements OnDestroy{
   myNavCtrl: NavController;
   sub: Subscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
+    public loadingCtrl: LoadingController) {
+    
+    let loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+    loading.present();
+
     this.sub = matchDb.getSummaryList().subscribe( people => {
       this.groupsListing.forEach(listing => listing.count = 0);
       people.forEach( person => {
@@ -40,6 +47,10 @@ export class GroupsPage implements OnDestroy{
             };
          });
       })
+      if (loading!=null) {
+        loading.dismiss();
+        loading = null
+      }
     });
   }
 

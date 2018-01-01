@@ -21,7 +21,9 @@
   </ng-container>
   <ng-container *ngIf="(matchDb.communityState | async)!=null">
     <ion-list>
-      <ion-item *ngFor="let person of newcomersSummary | async" (click)="showDetail(person.details_key, person.key)" detail-push>{{person.name}} </ion-item>
+      <ion-item *ngFor="let person of newcomersSummary | async" (click)="showDetail(person.details_key, person.key)" detail-push>{{person.name}} 
+          <button ion-button outline item-end (click)="showActions($event)">Contact</button>
+      </ion-item>
     </ion-list>
   </ng-container>
 </ion-content>

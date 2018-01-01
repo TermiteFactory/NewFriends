@@ -4,6 +4,7 @@ import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AlertController } from 'ionic-angular';
+import { AuthProvider, ProfileUid } from '../../providers/auth/auth';
 import { MatchstickDbProvider, DetailedData, Note } from '../../providers/matchstick-db/matchstick-db';
 
 /**
@@ -31,7 +32,7 @@ export class NewcomerDetailsPage implements OnDestroy {
   notesSub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
-    public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+    public alertCtrl: AlertController, public loadingCtrl: LoadingController, public authData: AuthProvider) {
 
       let loading = this.loadingCtrl.create({
         content: 'Please wait...'
@@ -43,7 +44,10 @@ export class NewcomerDetailsPage implements OnDestroy {
           this.local_data = data; 
           this.detailRtn = true;
           if (this.notesRtn==true) {
-            loading.dismiss();
+            if (loading!=null) {
+              loading.dismiss();
+              loading = null
+            }
           }
         }
       });
@@ -52,7 +56,10 @@ export class NewcomerDetailsPage implements OnDestroy {
           this.notes = data;
           this.notesRtn = true;
           if (this.detailRtn==true) {
-            loading.dismiss();
+            if (loading!=null) {
+              loading.dismiss();
+              loading = null
+            }
           }
         }
       });

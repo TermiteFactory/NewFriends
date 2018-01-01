@@ -22,4 +22,8 @@ export class BydateNewcomersComponent {
                                                summarykey: this.person.key });
   }
 
+  assignNewcomer(event: any) {
+    event.stopPropagation();
+  }
+
 }
