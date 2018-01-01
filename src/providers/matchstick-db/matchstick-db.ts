@@ -48,9 +48,9 @@ export class MatchstickDbProvider implements OnDestroy {
               observer.next(currentData);
             }
           });
-          stateSub = this.afd.object<string>('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
-            currentData.joinState = state;
-            if (currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
+          stateSub = this.afd.object<Permission>('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
+            if (state!=null && currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
+              currentData.joinState = state.auth;
               observer.next(currentData);
             }
           }); 
@@ -74,7 +74,11 @@ export class MatchstickDbProvider implements OnDestroy {
           let permissionSub: Subscription = this.afd.object('/communities/' + profileUid.community + '/permissions/').valueChanges().subscribe( (state) => {
             if (state != null) {
               if (state == 0 || !(profileUid.uid in state)) {
-                this.afd.object('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).set("Pending");
+                let permission = new Permission;
+                let userdata = this.authData.authState.getValue();
+                permission.email = userdata.email;
+                permission.name = userdata.displayName;
+                this.afd.object('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).set(permission);
               }
               permissionSub.unsubscribe();      
             }
@@ -275,6 +279,12 @@ export class MatchstickDbProvider implements OnDestroy {
     this.profileSub.unsubscribe();
   }
   
+}
+
+export class Permission {
+  auth: string = "Pending";
+  name: string = "";
+  email: string = "";
 }
 
 export class JoinData {
