@@ -49,9 +49,11 @@ export class MatchstickDbProvider implements OnDestroy {
             }
           });
           stateSub = this.afd.object<Permission>('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
-            if (state!=null && currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
+            if (state!=null) {
               currentData.joinState = state.auth;
-              observer.next(currentData);
+              if (currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
+                observer.next(currentData);
+              }
             }
           }); 
         }
