@@ -8,6 +8,9 @@
 
   <ion-navbar>
     <ion-title>{{ (authData.authState | async)?.displayName }}'s Settings</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-left (click)="logoutUser()"><ion-icon name="log-out"></ion-icon>Logout</button>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
@@ -16,25 +19,40 @@
 <ion-content padding>
   <ion-list>
     <ion-list-header>Account</ion-list-header>
-    <ion-item>
-      <button ion-button color="danger" (click)="logoutUser()" full>Log out of this account</button>
-    </ion-item>
-    <ion-item>
-        <ion-label>Joined Community</ion-label>
-        <ion-label>{{(matchDb.communityState | async)?.communityName}}</ion-label>
-    </ion-item>
-    <ion-item>
-        <ion-label>Member State</ion-label>
-        <ion-label>{{(matchDb.communityState | async)?.joinState}}</ion-label>
-    </ion-item>
-    <ion-item>
-      <button ion-button (click)="communityListPrompt()" full>Join a Community</button>
-    </ion-item>
-
+    <ng-container *ngIf="((matchDb.communityState | async)?.communityName)!=null">
+        <ion-item>
+            <ion-label color="primary" stacked>Joined Community</ion-label>
+            <ion-label>{{(matchDb.communityState | async)?.communityName}}</ion-label>
+            <button ion-button outline item-end (click)="communityListPrompt()">Switch</button> 
+        </ion-item>
+        <ion-item>
+            <ion-label color="primary" stacked>Membership State</ion-label>
+            <ion-label>{{(matchDb.communityState | async)?.joinState}}</ion-label>
+        </ion-item>
+    </ng-container>
+    <ng-container *ngIf="((matchDb.communityState | async)?.communityName)==null">
+        <ion-item>
+            <ion-label color="primary" stacked>Joined Community</ion-label>
+            <ion-label>&nbsp;</ion-label>
+            <button ion-button outline item-end (click)="communityListPrompt()">Join</button> 
+        </ion-item>
+        <ion-item>
+            <ion-label color="primary" stacked>Membership State</ion-label>
+            <ion-label>&nbsp;</ion-label>
+        </ion-item>
+    </ng-container>
     <ion-list-header>Administration</ion-list-header>
     <ion-item>
-      <button [disabled]="!(authData.profile | async)?.superadmin" ion-button (click)="communityPrompt()" full>Add Community</button>
+      <ion-label color="primary" stacked>Superadmin Status</ion-label>
+      <ion-label>{{((authData.profile | async)?.superadmin)?'Superadmin':'Member'}}</ion-label>
+      <button ion-button outline item-end [disabled]="!(authData.profile | async)?.superadmin" (click)="communityPrompt()">Add Community</button>
     </ion-item>
-    
+    <ng-container *ngIf="(authData.profile | async)?.superadmin" >
+        <ion-list-header>Member Management</ion-list-header>
+        <ion-item *ngFor="let permission of permissions | async">
+            <ion-label>{{permission.name}} ({{permission.email}})</ion-label>
+            <button ion-button outline item-end (click)="memberAction(permission)">{{permission.auth=='Member'?'Remove':'Approve'}}</button> 
+        </ion-item>
+    </ng-container>
   </ion-list>
 </ion-content>

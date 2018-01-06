@@ -62,7 +62,10 @@ communities
                     ... (more details of the person)
         - name: Value is the name of this community
         - permissions
-            - <Profile uid> : Value is Member/Pending/Removed
+            - <Profile uid> 
+                - auth: Value is Member/Pending/Removed
+                - email: Value is the email of the person
+                - name: value is the name of the person
 profiles
     - <Profile uid>
         - community: Value is the name of the community that has been joined (or "" if no joining)

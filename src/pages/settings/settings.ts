@@ -6,6 +6,7 @@ import { AlertController } from 'ionic-angular';
 import { MatchstickDbProvider, Community } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * Generated class for the SettingsPage page.
@@ -20,9 +21,12 @@ import { OnDestroy } from '@angular/core';
 })
 export class SettingsPage implements OnDestroy {
 
+  permissions: Observable<any[]>;
+  
   constructor(public navCtrl: NavController, public navParams: NavParams,public authData: AuthProvider, 
     public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider) {
-      
+    
+      this.permissions = matchDb.getPermissionsList();
   }
 
   ionViewDidLoad() {
@@ -64,6 +68,15 @@ export class SettingsPage implements OnDestroy {
 
   addCommunity(name: string) {
     this.matchDb.addCommunity(name);
+  }
+
+  memberAction(permission: any) {
+    if (permission.auth=='Pending') {
+      this.matchDb.updatePermission(permission.key, 'Member');
+    }
+    else {
+      this.matchDb.updatePermission(permission.key, 'Pending');
+    }
   }
 
   communityListPrompt() {

@@ -90,6 +90,10 @@ export class MatchstickDbProvider implements OnDestroy {
     });
   }
 
+  private getPermissionsLisRef(communityId: string): AngularFireList<any> | null {
+    return this.afd.list('/communities/' + communityId + '/permissions/');
+  }
+
   private getPersonListRef(communityId: string): AngularFireList<any> | null {
     return this.afd.list('/communities/' + communityId + '/data/persons');
   }
@@ -116,6 +120,11 @@ export class MatchstickDbProvider implements OnDestroy {
 
   private getPersonSingleNoteRef(detailedKey: string, communityId: string, noteId: string): AngularFireObject<any> {
     return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey + '/notes/' + noteId);
+  }
+
+  updatePermission(permissionKey: string, authState: string) {
+    let joinState = this.communityState.getValue();
+    this.afd.object('/communities/' + joinState.communityId + '/permissions/' + permissionKey).update({auth: authState});
   }
 
   updateData( detailedKey: string, summaryKey: string, data: DetailedData): Promise<void> {
@@ -179,6 +188,33 @@ export class MatchstickDbProvider implements OnDestroy {
     to.tag_cvl = from.tag_cvl;
     to.tag_pastor = from.tag_pastor;
     to.tag_nocontact = from.tag_nocontact;
+  }
+
+  getPermissionsList(): Observable<any[]> {
+    return Observable.create( (observer) => {
+      let permSub: Subscription = null;
+      let commSub: Subscription = this.communityState.subscribe( (state) => {
+        if (state!=null) {
+          permSub = this.getPermissionsLisRef(state.communityId).snapshotChanges().map(changes => {
+            return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+          }).subscribe( (list) => {
+            observer.next(list);
+          });
+        } else {
+          if (permSub!=null) {
+            permSub.unsubscribe();
+          }
+          observer.next([]);
+        }
+      });
+      // Return Unsubscribe function
+      return () => {
+        if (permSub!=null) {
+          permSub.unsubscribe();
+        }
+        commSub.unsubscribe();
+      }
+    });
   }
 
   getSummaryList(queryFn?: QueryFn): Observable<any[]> {
