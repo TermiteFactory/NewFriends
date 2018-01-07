@@ -32,4 +32,9 @@ export class AssignNewcomerPage {
     this.navCtrl.pop();
   }
 
+  removeAssign() {
+    this.matchDb.updateAssignment(this.navParams.data.summarykey, "",  "");
+    this.navCtrl.pop();
+  }
+
 }
