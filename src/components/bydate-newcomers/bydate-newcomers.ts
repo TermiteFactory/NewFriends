@@ -25,7 +25,8 @@ export class BydateNewcomersComponent {
   assignNewcomer(event: any) {
     event.stopPropagation();
     this.navCtrl.push("AssignNewcomerPage", { summarykey: this.person.key,
-                                              name: this.person.name});
+                                              name: this.person.name,
+                                              current: this.person.followup_name});
   }
 
 }

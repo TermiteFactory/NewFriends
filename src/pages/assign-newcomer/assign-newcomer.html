@@ -8,7 +8,7 @@
 
   <ion-navbar>
     <ion-title>Select for {{navParams.data.name}}</ion-title>
-    <ion-buttons end>
+    <ion-buttons *ngIf="navParams.data.current!=''" end>
         <button ion-button icon-left (click)="removeAssign()"><ion-icon name="trash"></ion-icon>Remove</button>
     </ion-buttons>
   </ion-navbar>
