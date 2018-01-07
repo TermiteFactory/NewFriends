@@ -8,6 +8,6 @@
   <button *ngIf="person.followup_name==''" ion-button outline item-end (click)="assignNewcomer($event)">Assign</button>  
 
   <ion-note *ngIf="person.followup_name!=''" item-end (click)="assignNewcomer($event)">
-      <ion-icon small name="heart"></ion-icon> by {{person.followup_name}}</ion-note>  
-  <button *ngIf="person.followup_name!=''" ion-button outline item-end (click)="assignNewcomer($event)"><ion-icon small name="refresh"></ion-icon></button>
+      <ion-icon small name="heart"></ion-icon> by {{person.followup_name}}
+  </ion-note>  
 </ion-item>
