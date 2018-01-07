@@ -18,7 +18,7 @@
 
 <ion-content padding>
   <ion-list>
-    <ion-list-header>Account</ion-list-header>
+    <ion-list-header color="light">Account</ion-list-header>
     <ng-container *ngIf="((matchDb.communityState | async)?.communityName)!=null">
         <ion-item>
             <ion-label color="primary" stacked>Joined Community</ion-label>
@@ -41,14 +41,14 @@
             <ion-label>&nbsp;</ion-label>
         </ion-item>
     </ng-container>
-    <ion-list-header>Administration</ion-list-header>
+    <ion-list-header color="light">Administration</ion-list-header>
     <ion-item>
       <ion-label color="primary" stacked>Superadmin Status</ion-label>
       <ion-label>{{((authData.profile | async)?.superadmin)?'Superadmin':'Member'}}</ion-label>
       <button ion-button outline item-end [disabled]="!(authData.profile | async)?.superadmin" (click)="communityPrompt()">Add Community</button>
     </ion-item>
     <ng-container *ngIf="(authData.profile | async)?.superadmin" >
-        <ion-list-header>Member Management</ion-list-header>
+        <ion-list-header color="light">Member Management</ion-list-header>
         <ion-item *ngFor="let permission of permissions | async">
             <ion-label>{{permission.name}} ({{permission.email}})</ion-label>
             <button ion-button outline item-end (click)="memberAction(permission)">{{permission.auth=='Member'?'Remove':'Approve'}}</button> 

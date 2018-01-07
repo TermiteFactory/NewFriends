@@ -58,6 +58,34 @@
           <ion-label color="primary" stacked>Visited Before?</ion-label>
           <ion-input readonly type="text" [ngModel]="local_data.visitedBefore"></ion-input>
         </ion-item>
+        <ion-item *ngIf="local_data.tag_alpha">
+            <ion-icon item-start name="checkbox" small></ion-icon>
+            <ion-label>Learn about Alpha</ion-label>
+        </ion-item>
+        <ion-item *ngIf="local_data.tag_connect">
+            <ion-icon item-start name="checkbox" small></ion-icon>
+            <ion-label>Learn about Connect/Cell Group</ion-label>
+        </ion-item>
+        <ion-item *ngIf="local_data.tag_churchschool">
+            <ion-icon item-start name="checkbox" small></ion-icon>
+            <ion-label>Learn Church School/XS</ion-label>
+        </ion-item>
+        <ion-item *ngIf="local_data.tag_yam">
+            <ion-icon item-start name="checkbox" small></ion-icon>
+            <ion-label>Learn about YAM</ion-label>
+        </ion-item>
+        <ion-item *ngIf="local_data.tag_cvl">
+            <ion-icon item-start name="checkbox" small></ion-icon>
+            <ion-label>Learn about CVL</ion-label>
+        </ion-item>
+        <ion-item *ngIf="local_data.tag_pastor">
+            <ion-icon item-start name="checkbox" small></ion-icon>
+            <ion-label>Speak to Pastor</ion-label>
+        </ion-item>
+        <ion-item *ngIf="local_data.tag_nocontact">
+            <ion-icon item-start name="checkbox" small></ion-icon>
+            <ion-label>Do not Contact</ion-label>
+        </ion-item>
       </ion-list>
     </ion-card-content>
   </ion-card>

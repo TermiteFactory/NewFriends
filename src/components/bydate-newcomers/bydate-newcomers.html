@@ -5,5 +5,7 @@
 </ion-list-header>
 <ion-item *ngIf="!person.header" (click)="showDetails()" detail-push> 
   {{person.name}} 
-  <button ion-button outline item-end (click)="assignNewcomer($event)">Assign</button>    
+  <button *ngIf="person.followup_name==''" ion-button outline item-end (click)="assignNewcomer($event)">Assign</button>  
+  <ion-note *ngIf="person.followup_name!=''" item-end (click)="assignNewcomer($event)">Assigned to {{person.followup_name}}</ion-note>  
+  <button *ngIf="person.followup_name!=''" ion-button outline item-end (click)="assignNewcomer($event)">Change</button>
 </ion-item>

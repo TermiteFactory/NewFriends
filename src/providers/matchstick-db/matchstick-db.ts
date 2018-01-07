@@ -122,6 +122,15 @@ export class MatchstickDbProvider implements OnDestroy {
     return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey + '/notes/' + noteId);
   }
 
+  updateAssignment(summaryKey: string, followup_id: string, followup_name: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let joinState = this.communityState.getValue();
+      this.getSummaryRef(summaryKey, joinState.communityId).update({followup_id: followup_id, followup_name: followup_name}).then( () => {
+        resolve();
+      }, () => reject);
+    });
+  }
+
   updatePermission(permissionKey: string, authState: string) {
     let joinState = this.communityState.getValue();
     this.afd.object('/communities/' + joinState.communityId + '/permissions/' + permissionKey).update({auth: authState});
@@ -188,6 +197,8 @@ export class MatchstickDbProvider implements OnDestroy {
     to.tag_cvl = from.tag_cvl;
     to.tag_pastor = from.tag_pastor;
     to.tag_nocontact = from.tag_nocontact;
+    to.email = from.email;
+    to.phone = from.phone;
   }
 
   getPermissionsList(): Observable<any[]> {
@@ -348,6 +359,10 @@ export class SummaryData {
   tag_cvl: boolean = false;
   tag_pastor: boolean = false;
   tag_nocontact: boolean = false;
+  email: string = "";
+  phone: string = "";
+  followup_name: string = "";
+  followup_id: string = "";  
 
   constructor() {
   }
