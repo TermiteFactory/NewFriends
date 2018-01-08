@@ -360,8 +360,6 @@ export class SummaryData {
   tag_nocontact: boolean = false;
   email: string = "";
   phone: string = "";
-  followup_name: string = "";
-  followup_id: string = "";  
 
   constructor() {
   }
@@ -379,6 +377,8 @@ export class Note {
 
 export class SummaryDataKey extends SummaryData {
   details_key: string = "";
+  followup_name: string = "";
+  followup_id: string = "";  
 
   constructor() {
     super();
