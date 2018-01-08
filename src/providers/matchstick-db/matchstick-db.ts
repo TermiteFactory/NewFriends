@@ -351,7 +351,6 @@ export class Community {
 export class SummaryData {
   date: string = "";
   name: string = "";
-  details_key: string = "";
   tag_alpha: boolean = false;
   tag_connect: boolean = false;
   tag_churchschool: boolean = false;
