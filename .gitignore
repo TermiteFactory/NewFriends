@@ -29,6 +29,8 @@ plugins/android.json
 plugins/ios.json
 www/
 src/app/firebaseconfig.ts
+GoogleService-Info.plist
+google-services.json
 $RECYCLE.BIN/
 
 .DS_Store
