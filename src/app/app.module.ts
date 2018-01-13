@@ -18,6 +18,8 @@ import {AngularFireDatabaseModule} from 'angularfire2/database'
 import {AngularFireAuthModule} from 'angularfire2/auth'
 
 import { FCM } from '@ionic-native/fcm';
+import { SMS } from '@ionic-native/sms';
+import { CallNumber } from '@ionic-native/call-number';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AuthProvider } from '../providers/auth/auth';
@@ -57,6 +59,8 @@ import { firebaseConfig } from './firebaseconfig';
     StatusBar,
     SplashScreen,
     FCM,
+    SMS,
+    CallNumber,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     AuthProvider,
     MatchstickDbProvider
