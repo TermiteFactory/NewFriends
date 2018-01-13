@@ -28,40 +28,4 @@ export class GroupListPage {
   ionViewDidLoad() {
     console.log('ionViewDidLoad GroupListPage');
   }
-
-  showDetail(personDetailsKey: string, personKey: string) {
-    this.navCtrl.push("NewcomerDetailsPage", { 
-      newcomerkey: personDetailsKey, 
-      summarykey: personKey 
-    });
-  }
-
-  showActions(event: any) {
-    event.stopPropagation();
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'Contact Newcomer',
-      buttons: [
-        {
-          text: 'Email',
-          role: 'email',
-          handler: () => {
-            console.log('Destructive clicked');
-          }
-        },{
-          text: 'Call',
-          role: 'call',
-          handler: () => {
-            console.log('Archive clicked');
-          }
-        },{
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-            console.log('Cancel clicked');
-          }
-        }
-      ]
-    });
-    actionSheet.present();
-  }
 }
