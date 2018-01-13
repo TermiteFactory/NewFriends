@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
+import { FCM } from '@ionic-native/fcm';
 
 /*
   Generated class for the MatchstickDbProvider provider.
@@ -20,8 +21,9 @@ export class MatchstickDbProvider implements OnDestroy {
 
   private communityStateObservable: Observable<JoinData | null>
   private profileSub: Subscription;
+  private token: string;
 
-  constructor(public authData: AuthProvider, public afd:AngularFireDatabase) {
+  constructor(public authData: AuthProvider, public afd:AngularFireDatabase, private fcm: FCM) {
     
     this.addUidToPermissions();
     
@@ -65,6 +67,14 @@ export class MatchstickDbProvider implements OnDestroy {
 
     this.communityState = new BehaviorSubject(null);
     this.communityStateObservable.subscribe(this.communityState);
+
+    // Get the current token
+    
+    fcm.onTokenRefresh().subscribe(token=>{
+      this.token = token;
+    }, error => {
+      this.token = '1234567';
+    })
   }
 
   // Listens to the change in profiles and will add the uid to the community when necessary 
@@ -120,6 +130,27 @@ export class MatchstickDbProvider implements OnDestroy {
 
   private getPersonSingleNoteRef(detailedKey: string, communityId: string, noteId: string): AngularFireObject<any> {
     return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey + '/notes/' + noteId);
+  }
+
+  updateNotifyNew(notify: boolean) {
+    let joinState = this.communityState.getValue();
+    if (notify==true) {
+      this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).set(true);
+    }
+    else {
+      this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).remove();
+    }
+  }
+
+  updateNotifyAssigned(notify: boolean) {
+    let joinState = this.communityState.getValue();
+    let profileuid = this.authData.profile.getValue();
+    if (notify==true) {
+      this.afd.object('/communities/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).set(true);
+    }
+    else {
+      this.afd.object('/communities/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
+    }
   }
 
   updateAssignment(summaryKey: string, followup_id: string, followup_name: string): Promise<void> {

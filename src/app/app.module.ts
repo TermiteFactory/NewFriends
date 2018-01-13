@@ -2,6 +2,7 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
+import { IonicStorageModule } from '@ionic/storage';
 
 import { NewComersPage } from '../pages/new-comers/new-comers';
 import { ForMePage } from '../pages/for-me/for-me';
@@ -16,6 +17,7 @@ import {AngularFireModule } from 'angularfire2'
 import {AngularFireDatabaseModule} from 'angularfire2/database'
 import {AngularFireAuthModule} from 'angularfire2/auth'
 
+import { FCM } from '@ionic-native/fcm';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AuthProvider } from '../providers/auth/auth';
@@ -35,6 +37,7 @@ import { firebaseConfig } from './firebaseconfig';
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp, {tabsHideOnSubPages: true}),
+    IonicStorageModule.forRoot(),
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule,
     ComponentsModule,
@@ -53,6 +56,7 @@ import { firebaseConfig } from './firebaseconfig';
   providers: [
     StatusBar,
     SplashScreen,
+    FCM,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     AuthProvider,
     MatchstickDbProvider

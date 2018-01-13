@@ -7,6 +7,7 @@ import { MatchstickDbProvider, Community } from '../../providers/matchstick-db/m
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { Storage } from '@ionic/storage';
 
 /**
  * Generated class for the SettingsPage page.
@@ -22,11 +23,30 @@ import { Observable } from 'rxjs/Observable';
 export class SettingsPage implements OnDestroy {
 
   permissions: Observable<any[]>;
+  newComerNotify: boolean;
+  newComerAssigned: boolean;
   
   constructor(public navCtrl: NavController, public navParams: NavParams,public authData: AuthProvider, 
-    public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider) {
+    public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider, private storage: Storage) {
     
       this.permissions = matchDb.getPermissionsList();
+
+      storage.get('newComerNotify').then((val) => {
+        if (val == null) {
+          this.newComerNotify = true;
+          this.updateNotify();
+        } else {
+          this.newComerNotify = val;
+        }
+      });
+      storage.get('newComerAssigned').then((val) => {
+        if (val == null) {
+          this.newComerAssigned = true;
+          this.updateAssigned();
+        } else {
+          this.newComerAssigned = val;
+        }
+      });
   }
 
   ionViewDidLoad() {
@@ -37,6 +57,16 @@ export class SettingsPage implements OnDestroy {
     this.authData.logoutUser().then( () => {
       this.app.getRootNav().setRoot('LoginPage');
     });
+  }
+
+  updateNotify() {
+    this.storage.set('newComerNotify', this.newComerNotify);
+    this.matchDb.updateNotifyNew(this.newComerNotify);
+  }
+
+  updateAssigned() {
+    this.storage.set('newComerAssigned', this.newComerAssigned);
+    this.matchDb.updateNotifyAssigned(this.newComerAssigned);
   }
 
   communityPrompt() {
