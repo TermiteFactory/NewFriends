@@ -69,12 +69,11 @@ export class MatchstickDbProvider implements OnDestroy {
     this.communityStateObservable.subscribe(this.communityState);
 
     // Get the current token
-    
-    fcm.onTokenRefresh().subscribe(token=>{
+    fcm.getToken().then( token => {
       this.token = token;
-    }, error => {
+    }).catch( () => {
       this.token = '1234567';
-    })
+    });
   }
 
   // Listens to the change in profiles and will add the uid to the community when necessary 

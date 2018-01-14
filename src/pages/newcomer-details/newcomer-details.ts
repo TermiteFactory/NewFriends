@@ -102,4 +102,8 @@ export class NewcomerDetailsPage implements OnDestroy {
     this.editNoteKey.next(note.key);
   }
 
+  cancelNote() {
+    this.editNoteKey.next("");
+  }
+
 }

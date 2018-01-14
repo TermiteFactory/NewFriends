@@ -20,6 +20,7 @@ import {AngularFireAuthModule} from 'angularfire2/auth'
 import { FCM } from '@ionic-native/fcm';
 import { SMS } from '@ionic-native/sms';
 import { CallNumber } from '@ionic-native/call-number';
+import { EmailComposer } from '@ionic-native/email-composer';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AuthProvider } from '../providers/auth/auth';
@@ -61,6 +62,7 @@ import { firebaseConfig } from './firebaseconfig';
     FCM,
     SMS,
     CallNumber,
+    EmailComposer,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     AuthProvider,
     MatchstickDbProvider

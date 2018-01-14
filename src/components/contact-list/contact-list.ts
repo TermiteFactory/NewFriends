@@ -4,7 +4,7 @@ import { NavController, NavParams, ActionSheetController } from 'ionic-angular';
 import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
 import { SMS } from '@ionic-native/sms';
 import { CallNumber } from '@ionic-native/call-number';
-
+import { EmailComposer } from '@ionic-native/email-composer';
 import { AuthProvider } from '../../providers/auth/auth';
 
 /**
@@ -22,7 +22,8 @@ export class ContactListComponent {
   @Input() newcomersSummary: Observable<any[]>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,public actionSheetCtrl: ActionSheetController, 
-    public matchDb: MatchstickDbProvider, private sms: SMS, public authData: AuthProvider, private callNumber: CallNumber) {
+    public matchDb: MatchstickDbProvider, private sms: SMS, public authData: AuthProvider, private callNumber: CallNumber,
+    private emailComposer: EmailComposer) {
   }
 
   showDetail(personDetailsKey: string, personKey: string) {
@@ -35,8 +36,21 @@ export class ContactListComponent {
   showActions(event: any, person: any) {
     event.stopPropagation();
 
-    let msg: string = 'Hi ' + person.name + ' this is ' + this.authData.authState.getValue().displayName + 
-    ' from Charis Methodist Church. It was good meeting you! Do let me know if you like more about our church. God bless and see you soon!';
+    let myname = this.authData.authState.getValue().displayName;
+
+    let textmsg: string = 'Hi ' + person.name + ' this is ' + myname + 
+    ' from Charis Methodist Church. It was good meeting you! Do let me know if you like to know more about our church. God Bless and see you soon!';
+
+    let email = {
+      to: person.email,
+      subject: 'Hello from Charis Methodist Church',
+      body: `<p>Hi `+ person.name + `,</p>
+        <p>This is ` + myname +  ` from Charis Methodist Church. It was nice meeting you! Do let me know if you like to know more about our church. God Bless and see you soon!</p>
+        <p>&nbsp;</p>
+        <p>Blessings,</p>
+        <p>` + myname + `</p>`,
+      isHtml: true
+    };
 
     let actionSheet = this.actionSheetCtrl.create({
       title: 'Contact Newcomer',
@@ -45,19 +59,25 @@ export class ContactListComponent {
           text: 'Email',
           role: 'email',
           handler: () => {
-            console.log('Destructive clicked');
+            this.emailComposer.isAvailable().then((available: boolean) =>{
+              if(available) {
+                this.emailComposer.open(email);
+              } else {
+                console.log('Email Composer not avail');
+              }
+             }).catch( () => {});
           }
         },{
           text: 'Call',
           role: 'call',
           handler: () => {
-            this.callNumber.callNumber(person.phone, false);
+            this.callNumber.callNumber(person.phone, false).catch(()=> {});
           }
         },{
           text: 'SMS',
           role: 'sms',
           handler: () => {
-            this.sms.send(person.phone, msg , {android: {intent: "INTENT"}});
+            this.sms.send(person.phone, textmsg , {android: {intent: "INTENT"}}).catch(()=> {});
           }
         },{
           text: 'Cancel',

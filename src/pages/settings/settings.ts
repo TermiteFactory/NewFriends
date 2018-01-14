@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Storage } from '@ionic/storage';
+import { FCM } from '@ionic-native/fcm';
 
 /**
  * Generated class for the SettingsPage page.
@@ -25,9 +26,11 @@ export class SettingsPage implements OnDestroy {
   permissions: Observable<any[]>;
   newComerNotify: boolean;
   newComerAssigned: boolean;
+  tokenSub: Subscription;
   
   constructor(public navCtrl: NavController, public navParams: NavParams,public authData: AuthProvider, 
-    public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider, private storage: Storage) {
+    public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider, private storage: Storage,
+    private fcm: FCM) {
     
       this.permissions = matchDb.getPermissionsList();
 
@@ -47,6 +50,12 @@ export class SettingsPage implements OnDestroy {
           this.newComerAssigned = val;
         }
       });
+
+      // Handle the case where the token can change after an OS upgrade
+      let tokenSub = this.fcm.onTokenRefresh().subscribe( () => {
+        this.updateAssigned();
+        this.updateNotify();
+      }, error => {});
   }
 
   ionViewDidLoad() {
@@ -143,6 +152,9 @@ export class SettingsPage implements OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.tokenSub != null) {
+      this.tokenSub.unsubscribe();
+    }
   }
 
 }
