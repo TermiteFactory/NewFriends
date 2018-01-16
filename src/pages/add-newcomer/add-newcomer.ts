@@ -40,9 +40,8 @@ export class AddNewcomerPage {
   }
 
   submit() {
-    this.matchDb.addData(this.newComer).then( ()=> {
-      this.navCtrl.pop();
-    });
+    this.matchDb.addData(this.newComer);
+    this.navCtrl.pop();
   }
 
 }

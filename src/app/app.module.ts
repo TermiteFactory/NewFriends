@@ -21,6 +21,7 @@ import { FCM } from '@ionic-native/fcm';
 import { SMS } from '@ionic-native/sms';
 import { CallNumber } from '@ionic-native/call-number';
 import { EmailComposer } from '@ionic-native/email-composer';
+import { LocalNotifications } from '@ionic-native/local-notifications';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AuthProvider } from '../providers/auth/auth';
@@ -63,6 +64,7 @@ import { firebaseConfig } from './firebaseconfig';
     SMS,
     CallNumber,
     EmailComposer,
+    LocalNotifications,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     AuthProvider,
     MatchstickDbProvider

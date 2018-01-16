@@ -44,17 +44,15 @@ export class EditNewcomerPage implements OnDestroy{
   }
 
   deleteNewcomer() {
-    this.matchDb.deleteData(this.navParams.data.newcomerkey, this.navParams.data.summarykey).then( () => {
-      this.navCtrl.popToRoot();
-    });
+    this.matchDb.deleteData(this.navParams.data.newcomerkey, this.navParams.data.summarykey);
+    this.navCtrl.popToRoot();
   }
 
   submitEdit() {
     this.matchDb.updateData(this.navParams.data.newcomerkey, 
                             this.navParams.data.summarykey, 
-                            this.local_data).then( () => {
-      this.navCtrl.pop();
-    });
+                            this.local_data);
+    this.navCtrl.pop();
   }
 
   undoEdit() {

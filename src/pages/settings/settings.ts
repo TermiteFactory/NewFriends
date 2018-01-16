@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, LoadingController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { App } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
@@ -7,7 +7,6 @@ import { MatchstickDbProvider, Community } from '../../providers/matchstick-db/m
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Storage } from '@ionic/storage';
 import { FCM } from '@ionic-native/fcm';
 
 /**
@@ -29,33 +28,10 @@ export class SettingsPage implements OnDestroy {
   tokenSub: Subscription;
   
   constructor(public navCtrl: NavController, public navParams: NavParams,public authData: AuthProvider, 
-    public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider, private storage: Storage,
-    private fcm: FCM) {
+    public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider, private fcm: FCM,
+    public loadingCtrl: LoadingController) {
     
       this.permissions = matchDb.getPermissionsList();
-
-      storage.get('newComerNotify').then((val) => {
-        if (val == null) {
-          this.newComerNotify = true;
-          this.updateNotify();
-        } else {
-          this.newComerNotify = val;
-        }
-      });
-      storage.get('newComerAssigned').then((val) => {
-        if (val == null) {
-          this.newComerAssigned = true;
-          this.updateAssigned();
-        } else {
-          this.newComerAssigned = val;
-        }
-      });
-
-      // Handle the case where the token can change after an OS upgrade
-      let tokenSub = this.fcm.onTokenRefresh().subscribe( () => {
-        this.updateAssigned();
-        this.updateNotify();
-      }, error => {});
   }
 
   ionViewDidLoad() {
@@ -66,16 +42,6 @@ export class SettingsPage implements OnDestroy {
     this.authData.logoutUser().then( () => {
       this.app.getRootNav().setRoot('LoginPage');
     });
-  }
-
-  updateNotify() {
-    this.storage.set('newComerNotify', this.newComerNotify);
-    this.matchDb.updateNotifyNew(this.newComerNotify);
-  }
-
-  updateAssigned() {
-    this.storage.set('newComerAssigned', this.newComerAssigned);
-    this.matchDb.updateNotifyAssigned(this.newComerAssigned);
   }
 
   communityPrompt() {
@@ -119,6 +85,11 @@ export class SettingsPage implements OnDestroy {
   }
 
   communityListPrompt() {
+    let loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+    loading.present();
+
     let communityListSub: Subscription = this.matchDb.getCommunityList().subscribe( (list) => {
       if (list!=null) {
         let inputList = [];
@@ -145,6 +116,10 @@ export class SettingsPage implements OnDestroy {
           ]
         });
         prompt.present();
+        if (loading!=null) {
+          loading.dismiss();
+          loading = null
+        }
       }
 
       communityListSub.unsubscribe();

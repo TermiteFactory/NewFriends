@@ -7,6 +7,9 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 import { FCM } from '@ionic-native/fcm';
+import { LocalNotifications } from '@ionic-native/local-notifications';
+import { AlertController } from 'ionic-angular';
+import { Storage } from '@ionic/storage';
 
 /*
   Generated class for the MatchstickDbProvider provider.
@@ -18,55 +21,61 @@ import { FCM } from '@ionic-native/fcm';
 export class MatchstickDbProvider implements OnDestroy {
   
   communityState: BehaviorSubject<JoinData | null>;
+  newcomerNotify: BehaviorSubject<boolean>;
+  newcomerAssigned: BehaviorSubject<boolean>;
 
-  private communityStateObservable: Observable<JoinData | null>
-  private profileSub: Subscription;
+  private previousState: JoinData;
+  private profileSub1: Subscription;
+  private profileSub2: Subscription;
+  private stateSub: Subscription;
+  private nameSub: Subscription;
+  private tokenSub: Subscription;
   private token: string;
 
-  constructor(public authData: AuthProvider, public afd:AngularFireDatabase, private fcm: FCM) {
+  constructor(public authData: AuthProvider, public afd:AngularFireDatabase, private fcm: FCM, 
+    private localNotifications: LocalNotifications, private alertCtrl: AlertController, private storage: Storage) {
     
     this.addUidToPermissions();
     
-    this.communityStateObservable = Observable.create( (observer) => {
-      let stateSub: Subscription = null;
-      let nameSub: Subscription = null;
-      
-      let profileUidSub: Subscription = this.authData.profile.subscribe( (profileUid) => {
-        if (stateSub != null) {
-          stateSub.unsubscribe();
-        }
-        if (nameSub != null) {
-          nameSub.unsubscribe();
-        }
-        if (profileUid == null || profileUid.community == "") {
-          observer.next(null);
-        }
-        else {
-          let currentData: JoinData = new JoinData;
-          nameSub = this.afd.object<string>('/communities/' + profileUid.community + '/name').valueChanges().subscribe( (name) => {
-            currentData.communityName = name;
-            currentData.communityId = profileUid.community;
-            if (currentData.joinState != "Invalid") {
-              observer.next(currentData);
-            }
-          });
-          stateSub = this.afd.object<Permission>('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
-            if (state!=null) {
-              currentData.joinState = state.auth;
-              if (currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
-                observer.next(currentData);
-              }
-            }
-          }); 
-        }
-      });
-      return () => {
-        profileUidSub.unsubscribe();
-      };
-    });
-
+    this.stateSub = null;
+    this.nameSub = null;
     this.communityState = new BehaviorSubject(null);
-    this.communityStateObservable.subscribe(this.communityState);
+    this.previousState = null;
+      
+    this.profileSub1 = this.authData.profile.subscribe( (profileUid) => {
+      let SetBehaviorSub = (value) => {
+        this.previousState = this.communityState.getValue();
+        this.communityState.next(value);
+      }
+
+      if (this.stateSub != null) {
+        this.stateSub.unsubscribe();
+      }
+      if (this.nameSub != null) {
+        this.nameSub.unsubscribe();
+      }
+      if (profileUid == null || profileUid.community == "") {
+        SetBehaviorSub(null);
+      }
+      else {
+        let currentData: JoinData = new JoinData;
+        this.nameSub = this.afd.object<string>('/communities/' + profileUid.community + '/name').valueChanges().subscribe( (name) => {
+          currentData.communityName = name;
+          currentData.communityId = profileUid.community;
+          if (currentData.joinState != "Invalid") {
+            SetBehaviorSub(currentData);
+          }
+        });
+        this.stateSub = this.afd.object<Permission>('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
+          if (state!=null) {
+            currentData.joinState = state.auth;
+            if (currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
+              SetBehaviorSub(currentData);
+            }
+          }
+        }); 
+      }
+    });
 
     // Get the current token
     fcm.getToken().then( token => {
@@ -74,11 +83,73 @@ export class MatchstickDbProvider implements OnDestroy {
     }).catch( () => {
       this.token = '1234567';
     });
+
+    // Init the values
+    this.newcomerNotify = new BehaviorSubject(true);
+    this.newcomerAssigned = new BehaviorSubject(true);
+
+    // Get the latest values from storage and set the behavior subject
+    // No need to set DB as this will be done on community detection
+    storage.get('newComerNotify').then((val) => {
+      if (val == null) {    
+        this.storage.set('newComerNotify', true); 
+      } else {
+        this.newcomerNotify.next(val);
+      }
+    });
+    storage.get('newComerAssigned').then((val) => {
+      if (val == null) {
+        this.storage.set('newComerAssigned', true);
+      } else {
+        this.newcomerAssigned.next(val);
+      }
+    });
+
+    // Handle the case where the token can change after an OS upgrade
+    // Just set the DB on change as there is no change in behavior subject
+    this.tokenSub = this.fcm.onTokenRefresh().subscribe( () => {
+      this.updateNotifyNewDB(this.newcomerNotify.getValue());
+      this.updateNotifyAssignedDB(this.newcomerAssigned.getValue());
+    }, error => {});
+
+    fcm.onNotification().subscribe( data => {
+      let alert = null;
+      if(data.wasTapped){
+        alert = this.alertCtrl.create({
+          title: 'Notify Foreground',
+          buttons: ['Dismiss']
+        });
+        alert.present();
+      } else {
+        alert = this.alertCtrl.create({
+          title: 'Notify Foreground',
+          buttons: ['Dismiss']
+        });
+        alert.present();
+      }
+    }, error => {});
+
+    // Get the community change
+    this.communityState.subscribe( (joinstate) => {
+      if (joinstate != null && joinstate.joinState == "Member") {
+        // Register tokens when joining a community
+        this.updateNotifyNewDB(this.newcomerNotify.getValue());
+        this.updateNotifyAssignedDB(this.newcomerAssigned.getValue());
+
+      } else {
+        // Remove previous tokens
+        if (this.previousState!=null && this.previousState.joinState== "Member") {
+          this.afd.object('/communities/' + this.previousState.communityId + '/notifytokens/'+ this.token).remove();
+          let profileuid = this.authData.profile.getValue();
+          this.afd.object('/communities/' + this.previousState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
+        }
+      }
+    });
   }
 
   // Listens to the change in profiles and will add the uid to the community when necessary 
   addUidToPermissions() {
-    this.profileSub = this.authData.profile.subscribe( (profileUid) => {
+    this.profileSub2 = this.authData.profile.subscribe( (profileUid) => {
       // if this is null it means we are logged out
       if (profileUid!=null) {
         if (profileUid.community != "") {
@@ -132,23 +203,39 @@ export class MatchstickDbProvider implements OnDestroy {
   }
 
   updateNotifyNew(notify: boolean) {
+    this.storage.set('newComerNotify', notify);
+    this.newcomerNotify.next(notify);
+    this.updateNotifyNewDB(notify);
+  }
+
+  updateNotifyNewDB(notify: boolean) {
     let joinState = this.communityState.getValue();
-    if (notify==true) {
-      this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).set(true);
-    }
-    else {
-      this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).remove();
+    if (joinState != null && joinState.joinState == "Member") {
+      if (notify==true) {
+        this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).set(true);
+      }
+      else {
+        this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).remove();
+      }
     }
   }
 
   updateNotifyAssigned(notify: boolean) {
+    this.storage.set('newComerAssigned', notify);
+    this.newcomerAssigned.next(notify);
+    this.updateNotifyAssignedDB(notify);
+  }
+
+  updateNotifyAssignedDB(notify: boolean) {
     let joinState = this.communityState.getValue();
-    let profileuid = this.authData.profile.getValue();
-    if (notify==true) {
-      this.afd.object('/communities/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).set(true);
-    }
-    else {
-      this.afd.object('/communities/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
+    if (joinState != null && joinState.joinState == "Member") {
+      let profileuid = this.authData.profile.getValue();
+      if (notify==true) {
+        this.afd.object('/communities/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).set(true);
+      }
+      else {
+        this.afd.object('/communities/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
+      }
     }
   }
 
@@ -355,7 +442,15 @@ export class MatchstickDbProvider implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.profileSub.unsubscribe();
+    this.profileSub1.unsubscribe();
+    this.profileSub2.unsubscribe();
+    this.tokenSub.unsubscribe();
+    if (this.stateSub != null) {
+      this.stateSub.unsubscribe();
+    }
+    if (this.nameSub != null) {
+      this.nameSub.unsubscribe();
+    }
   }
   
 }

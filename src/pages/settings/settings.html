@@ -44,11 +44,11 @@
     <ion-list-header color="light">Notifications</ion-list-header>
     <ion-item>
         <ion-label>Newcomer Added</ion-label>
-        <ion-toggle item-end  (ionChange)="updateNotify()" [(ngModel)]="newComerNotify"></ion-toggle>
+        <ion-toggle item-end  (ionChange)="matchDb.updateNotifyNew(!matchDb.newcomerNotify.getValue())" [ngModel]="matchDb.newcomerNotify | async"></ion-toggle>
     </ion-item>
     <ion-item>
         <ion-label>Newcomer Assigned to Me</ion-label>
-        <ion-toggle item-end  (ionChange)="updateAssigned()" [(ngModel)]="newComerAssigned"></ion-toggle>
+        <ion-toggle item-end  (ionChange)="matchDb.updateNotifyAssigned(!matchDb.newcomerAssigned .getValue())" [ngModel]="matchDb.newcomerAssigned | async"></ion-toggle>
     </ion-item>
     <ion-list-header color="light">Administration</ion-list-header>
     <ion-item>
