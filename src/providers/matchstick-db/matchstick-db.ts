@@ -10,6 +10,7 @@ import { FCM } from '@ionic-native/fcm';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { AlertController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
+import { Platform } from 'ionic-angular';
 
 /*
   Generated class for the MatchstickDbProvider provider.
@@ -30,10 +31,12 @@ export class MatchstickDbProvider implements OnDestroy {
   private stateSub: Subscription;
   private nameSub: Subscription;
   private tokenSub: Subscription;
+  private notifySub: Subscription;
   private token: string;
 
   constructor(public authData: AuthProvider, public afd:AngularFireDatabase, private fcm: FCM, 
-    private localNotifications: LocalNotifications, private alertCtrl: AlertController, private storage: Storage) {
+    private localNotifications: LocalNotifications, private alertCtrl: AlertController, private storage: Storage,
+    public plt: Platform) {
     
     this.addUidToPermissions();
     
@@ -112,23 +115,6 @@ export class MatchstickDbProvider implements OnDestroy {
       this.updateNotifyAssignedDB(this.newcomerAssigned.getValue());
     }, error => {});
 
-    fcm.onNotification().subscribe( data => {
-      let alert = null;
-      if(data.wasTapped){
-        alert = this.alertCtrl.create({
-          title: 'Notify Foreground',
-          buttons: ['Dismiss']
-        });
-        alert.present();
-      } else {
-        alert = this.alertCtrl.create({
-          title: 'Notify Foreground',
-          buttons: ['Dismiss']
-        });
-        alert.present();
-      }
-    }, error => {});
-
     // Get the community change
     this.communityState.subscribe( (joinstate) => {
       if (joinstate != null && joinstate.joinState == "Member") {
@@ -144,6 +130,31 @@ export class MatchstickDbProvider implements OnDestroy {
           this.afd.object('/communities/' + this.previousState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
         }
       }
+    });
+
+    // Only when platform is ready
+    plt.ready().then( () => {
+      console.log('Platform is ready. Starting to subscribe for notifications');
+
+      // Register for notification callback
+      this.notifySub = fcm.onNotification().subscribe( data => {
+        console.log('onNotification Callback');
+        let alert;
+        if (data.wasTapped) {
+          //Notification was received on device tray and tapped by the user.
+        } else {
+          //Notification was received in foreground. Maybe the user needs to be notified.
+          if (data.adderId != this.authData.profile.getValue().uid) {
+            this.localNotifications.schedule({
+              title: data.titleData,
+              text: data.bodyData,
+              sound: 'default',
+            });
+          }
+        }
+      }, error => {
+        console.log('onNotification Error');
+      });
     });
   }
 
@@ -239,10 +250,10 @@ export class MatchstickDbProvider implements OnDestroy {
     }
   }
 
-  updateAssignment(summaryKey: string, followup_id: string, followup_name: string): Promise<void> {
+  updateAssignment(summaryKey: string, followup_id: string, followup_name: string, assign_id: string): Promise<void> {
     return new Promise((resolve, reject) => {
       let joinState = this.communityState.getValue();
-      this.getSummaryRef(summaryKey, joinState.communityId).update({followup_id: followup_id, followup_name: followup_name}).then( () => {
+      this.getSummaryRef(summaryKey, joinState.communityId).update({followup_id: followup_id, followup_name: followup_name, assign_id: assign_id}).then( () => {
         resolve();
       }, () => reject);
     });
@@ -285,6 +296,7 @@ export class MatchstickDbProvider implements OnDestroy {
       this.getPersonListRef(joinState.communityId).push(person).then( pushRtn => {
         let summary = new SummaryDataKey;
         this.copyToSummary(detailData, summary);
+        summary.add_id = this.authData.profile.getValue().uid;
         summary.details_key = pushRtn.key;
         this.getSummaryListRef(joinState.communityId).push(summary).then( () => {
           resolve();
@@ -451,6 +463,9 @@ export class MatchstickDbProvider implements OnDestroy {
     if (this.nameSub != null) {
       this.nameSub.unsubscribe();
     }
+    if (this.notifySub != null) {
+      this.notifySub.unsubscribe();
+    }
   }
   
 }
@@ -504,6 +519,8 @@ export class SummaryDataKey extends SummaryData {
   details_key: string = "";
   followup_name: string = "";
   followup_id: string = "";  
+  assign_id: string ="";
+  add_id: string ="";
 
   constructor() {
     super();
