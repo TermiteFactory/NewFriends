@@ -117,19 +117,25 @@
 
 <ion-footer no-border>
   <ion-toolbar>
-    <ion-segment>
-      <ion-segment-button (click)=deleteNewcomer()>
-        <ion-icon name="trash"></ion-icon>
-        Delete
-      </ion-segment-button>
-      <ion-segment-button (click)=undoEdit()>
-        <ion-icon name="undo"></ion-icon>
-        Undo Edit
-      </ion-segment-button>
-      <ion-segment-button (click)=submitEdit()>
-        <ion-icon name="send"></ion-icon>
-        Submit Edit
-      </ion-segment-button>
-    </ion-segment>
+    <ion-row text-center>
+      <ion-col>
+        <button outline ion-button (click)=deleteNewcomer()>
+          <ion-icon name="trash"></ion-icon>
+          Delete
+        </button>
+      </ion-col>
+      <ion-col>
+        <button outline ion-button (click)=undoEdit()>
+          <ion-icon name="undo"></ion-icon>
+          Undo Edit
+        </button>
+      </ion-col>
+      <ion-col>
+        <button outline ion-button (click)=submitEdit()>
+          <ion-icon name="send"></ion-icon>
+          Submit
+        </button>
+      </ion-col>
+    </ion-row>
   </ion-toolbar>
 </ion-footer>

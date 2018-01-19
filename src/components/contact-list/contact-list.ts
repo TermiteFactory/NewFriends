@@ -38,17 +38,15 @@ export class ContactListComponent {
 
     let myname = this.authData.authState.getValue().displayName;
 
-    let textmsg: string = 'Hi ' + person.name + ' this is ' + myname + 
-    ' from Charis Methodist Church. It was good meeting you! Do let me know if you like to know more about our church. God Bless and see you soon!';
+    let replace_data = (data: string): string => {
+      let newData = data.replace('{personname}', person.name);
+      return newData.replace('{myname}', myname);
+    };
 
     let email = {
       to: person.email,
-      subject: 'Hello from Charis Methodist Church',
-      body: `<p>Hi `+ person.name + `,</p>
-        <p>This is ` + myname +  ` from Charis Methodist Church. It was nice meeting you! Do let me know if you like to know more about our church. God Bless and see you soon!</p>
-        <p>&nbsp;</p>
-        <p>Blessings,</p>
-        <p>` + myname + `</p>`,
+      subject: "",
+      body: "",
       isHtml: true
     };
 
@@ -59,13 +57,16 @@ export class ContactListComponent {
           text: 'Email',
           role: 'email',
           handler: () => {
-            this.emailComposer.isAvailable().then((available: boolean) =>{
-              if(available) {
-                this.emailComposer.open(email);
-              } else {
-                console.log('Email Composer not avail');
-              }
-             }).catch( () => {});
+            console.log('Email clicked');
+            let sub1 = this.matchDb.getEmailSubject().subscribe( subject => {
+              let sub2 = this.matchDb.getEmailBody().subscribe( body => {
+                email.subject = replace_data(subject);
+                email.body = replace_data(body);
+                this.emailComposer.open(email).catch(()=> {});
+                sub2.unsubscribe();
+              })
+              sub1.unsubscribe();
+            })
           }
         },{
           text: 'Call',
@@ -77,7 +78,11 @@ export class ContactListComponent {
           text: 'SMS',
           role: 'sms',
           handler: () => {
-            this.sms.send(person.phone, textmsg , {android: {intent: "INTENT"}}).catch(()=> {});
+            let sub = this.matchDb.getSmsString().subscribe( data => {
+              let newData = replace_data(data);
+              this.sms.send(person.phone, newData , {android: {intent: "INTENT"}}).catch(()=> {});
+              sub.unsubscribe();
+            })
           }
         },{
           text: 'Cancel',

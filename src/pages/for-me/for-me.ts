@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ActionSheetController } from 'ionic-angular';
+import { NavController, NavParams } from 'ionic-angular';
 import { Observable } from 'rxjs/Observable';
 import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
-import { AuthProvider, ProfileUid } from '../../providers/auth/auth';
+import { AuthProvider } from '../../providers/auth/auth';
 
 /**
  * Generated class for the ForMePage page.

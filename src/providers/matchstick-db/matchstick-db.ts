@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AuthProvider, ProfileUid } from '../../providers/auth/auth';
+import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireObject, QueryFn } from 'angularfire2/database/interfaces';
 import { Observable } from 'rxjs/Observable';
@@ -8,7 +8,6 @@ import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 import { FCM } from '@ionic-native/fcm';
 import { LocalNotifications } from '@ionic-native/local-notifications';
-import { AlertController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { Platform } from 'ionic-angular';
 
@@ -35,7 +34,7 @@ export class MatchstickDbProvider implements OnDestroy {
   private token: string;
 
   constructor(public authData: AuthProvider, public afd:AngularFireDatabase, private fcm: FCM, 
-    private localNotifications: LocalNotifications, private alertCtrl: AlertController, private storage: Storage,
+    private localNotifications: LocalNotifications, private storage: Storage,
     public plt: Platform) {
     
     this.addUidToPermissions();
@@ -139,7 +138,6 @@ export class MatchstickDbProvider implements OnDestroy {
       // Register for notification callback
       this.notifySub = fcm.onNotification().subscribe( data => {
         console.log('onNotification Callback');
-        let alert;
         if (data.wasTapped) {
           //Notification was received on device tray and tapped by the user.
         } else {
@@ -211,6 +209,18 @@ export class MatchstickDbProvider implements OnDestroy {
 
   private getPersonSingleNoteRef(detailedKey: string, communityId: string, noteId: string): AngularFireObject<any> {
     return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey + '/notes/' + noteId);
+  }
+
+  getEmailSubject(): Observable<string> {
+    return this.afd.object<string>('/communities/' + this.communityState.getValue().communityId + '/messages/emailsubject').valueChanges();
+  }
+
+  getEmailBody(): Observable<string> {
+    return this.afd.object<string>('/communities/' + this.communityState.getValue().communityId + '/messages/emailbody').valueChanges();
+  }
+
+  getSmsString(): Observable<string> {
+    return this.afd.object<string>('/communities/' + this.communityState.getValue().communityId + '/messages/sms').valueChanges();
   }
 
   updateNotifyNew(notify: boolean) {

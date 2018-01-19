@@ -4,8 +4,8 @@ import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AlertController } from 'ionic-angular';
-import { AuthProvider, ProfileUid } from '../../providers/auth/auth';
-import { MatchstickDbProvider, DetailedData, Note } from '../../providers/matchstick-db/matchstick-db';
+import { AuthProvider } from '../../providers/auth/auth';
+import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-db/matchstick-db';
 
 /**
  * Generated class for the NewcomerDetailsPage page.

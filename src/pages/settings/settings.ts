@@ -3,11 +3,10 @@ import { NavController, NavParams, LoadingController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { App } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
-import { MatchstickDbProvider, Community } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { FCM } from '@ionic-native/fcm';
 
 /**
  * Generated class for the SettingsPage page.
@@ -28,7 +27,7 @@ export class SettingsPage implements OnDestroy {
   tokenSub: Subscription;
   
   constructor(public navCtrl: NavController, public navParams: NavParams,public authData: AuthProvider, 
-    public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider, private fcm: FCM,
+    public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider,
     public loadingCtrl: LoadingController) {
     
       this.permissions = matchDb.getPermissionsList();
