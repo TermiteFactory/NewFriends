@@ -109,7 +109,7 @@ exports.sendAssignmentNotification = functions.database.ref('/communities/{commu
     console.log('Newcomer has been assigned to you for care:', communityId, 'for Person:', summaryId, ' to ', event.data.val());
   
     // Get the list of device notification tokens.
-    const getDeviceTokensPromise = admin.database().ref(`/communities/${communityId}/permissions/${event.data.val()}/notifytokens`).once('value');
+    const getDeviceTokensPromise = admin.database().ref(`/communitiesinfo/${communityId}/permissions/${event.data.val()}/notifytokens`).once('value');
   
     // Get new comer name.
     const getNewcomerNamePromise = admin.database().ref(`/communities/${communityId}/data/summary/${summaryId}/name`).once('value');

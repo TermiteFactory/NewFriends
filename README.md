@@ -124,18 +124,28 @@ communities
                     ... (more details of the person)
         - name: Value is the name of this community
         - permissions
-            - <Profile uid> 
-                - auth: Value is Member/Pending/Removed
-                - email: Value is the email of the person
-                - name: value is the name of the person
+            - <Profile uid>: Value is true. This is set by the superadmin. Cannot be changed by anyone else
         - messages
             - sms: sms text
             - emailsubject: subject of the email
             - emailbody: body text of the email
+        - notifytokens
+            - <tokenid>: Value is true. tokens for sending push notifications when a new is added 
 profiles
     - <Profile uid>
         - community: Value is the name of the community that has been joined (or "" if no joining)
         - superadmin: true if this is a super admin, or false otherwise.
+
+communitiesinfo
+    - <Community ID>
+        - name: Name of the community
+        - permissions
+            - <Profile uid> 
+                - auth: Value is Member/Pending/Removed
+                - email: Value is the email of the person
+                - name: value is the name of the person
+                - notifytokens: 
+                    - <tokenid> : Value is true. tokens for sending push notifications when a newcomer is added to your care
 
 ```
 
