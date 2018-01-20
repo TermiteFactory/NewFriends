@@ -146,7 +146,6 @@ export class MatchstickDbProvider implements OnDestroy {
             this.localNotifications.schedule({
               title: data.titleData,
               text: data.bodyData,
-              sound: 'default',
             });
           }
         }
@@ -501,8 +500,11 @@ export class JoinData {
 
 export class Community {
   name: string = "";
-  permissions: 0;
-  data: { summary: 0, persons: 0};
+  permissions = 0;
+  data = { summary: 0, persons: 0};
+  messages = { emailbody: "<p>Hi {personname},</p><p>This is {myname} from XXXX. It was nice meeting you! Do let me know if you like to know more about our church. God Bless and see you soon!</p><p>&nbsp;</p><p>Blessings,<br>{myname}</p>",
+              emailsubject: "Hello from XXXX",
+              sms: "Hello {personname} this is {myname} from XXXX. It was good meeting you! Do let me know if you like to know more about our church. God Bless and see you soon!" };
 }
 
 export class SummaryData {
