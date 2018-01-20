@@ -61,14 +61,14 @@ export class MatchstickDbProvider implements OnDestroy {
       }
       else {
         let currentData: JoinData = new JoinData;
-        this.nameSub = this.afd.object<string>('/communities/' + profileUid.community + '/name').valueChanges().subscribe( (name) => {
+        this.nameSub = this.afd.object<string>('/communitiesinfo/' + profileUid.community + '/name').valueChanges().subscribe( (name) => {
           currentData.communityName = name;
           currentData.communityId = profileUid.community;
           if (currentData.joinState != "Invalid") {
             SetBehaviorSub(currentData);
           }
         });
-        this.stateSub = this.afd.object<Permission>('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
+        this.stateSub = this.afd.object<Permission>('/communitiesinfo/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
           if (state!=null) {
             currentData.joinState = state.auth;
             if (currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
@@ -124,9 +124,9 @@ export class MatchstickDbProvider implements OnDestroy {
       } else {
         // Remove previous tokens
         if (this.previousState!=null && this.previousState.joinState== "Member") {
-          this.afd.object('/communities/' + this.previousState.communityId + '/notifytokens/'+ this.token).remove();
+          this.afd.object('/communitiesinfo/' + this.previousState.communityId + '/notifytokens/'+ this.token).remove();
           let profileuid = this.authData.profile.getValue();
-          this.afd.object('/communities/' + this.previousState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
+          this.afd.object('/communitiesinfo/' + this.previousState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
         }
       }
     });
@@ -162,17 +162,15 @@ export class MatchstickDbProvider implements OnDestroy {
       // if this is null it means we are logged out
       if (profileUid!=null) {
         if (profileUid.community != "") {
-          let permissionSub: Subscription = this.afd.object('/communities/' + profileUid.community + '/permissions/').valueChanges().subscribe( (state) => {
-            if (state != null) {
-              if (state == 0 || !(profileUid.uid in state)) {
-                let permission = new Permission;
-                let userdata = this.authData.authState.getValue();
-                permission.email = userdata.email;
-                permission.name = userdata.displayName;
-                this.afd.object('/communities/' + profileUid.community + '/permissions/' + profileUid.uid).set(permission);
-              }
-              permissionSub.unsubscribe();      
+          let permissionSub: Subscription = this.afd.object('/communitiesinfo/' + profileUid.community + '/permissions/').valueChanges().subscribe( (state) => {
+            if (state == null || state == 0 || !(profileUid.uid in state)) {
+              let permission = new Permission;
+              let userdata = this.authData.authState.getValue();
+              permission.email = userdata.email;
+              permission.name = userdata.displayName;
+              this.afd.object('/communitiesinfo/' + profileUid.community + '/permissions/' + profileUid.uid).set(permission);
             }
+            permissionSub.unsubscribe();      
           }); 
         }
       }
@@ -180,7 +178,7 @@ export class MatchstickDbProvider implements OnDestroy {
   }
 
   private getPermissionsLisRef(communityId: string): AngularFireList<any> | null {
-    return this.afd.list('/communities/' + communityId + '/permissions/');
+    return this.afd.list('/communitiesinfo/' + communityId + '/permissions/');
   }
 
   private getPersonListRef(communityId: string): AngularFireList<any> | null {
@@ -252,10 +250,10 @@ export class MatchstickDbProvider implements OnDestroy {
     if (joinState != null && joinState.joinState == "Member") {
       let profileuid = this.authData.profile.getValue();
       if (notify==true) {
-        this.afd.object('/communities/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).set(true);
+        this.afd.object('/communitiesinfo/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).set(true);
       }
       else {
-        this.afd.object('/communities/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
+        this.afd.object('/communitiesinfo/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
       }
     }
   }
@@ -271,7 +269,14 @@ export class MatchstickDbProvider implements OnDestroy {
 
   updatePermission(permissionKey: string, authState: string) {
     let joinState = this.communityState.getValue();
-    this.afd.object('/communities/' + joinState.communityId + '/permissions/' + permissionKey).update({auth: authState});
+    if (authState == "Member") {
+      this.afd.object('/communities/' + joinState.communityId + '/permissions/' + permissionKey).set(true);
+    }
+    this.afd.object('/communitiesinfo/' + joinState.communityId + '/permissions/' + permissionKey).update({auth: authState}).then(() => {
+      if (authState != "Member") {
+        this.afd.object('/communities/' + joinState.communityId + '/permissions/' + permissionKey).remove();
+      }
+    });
   }
 
   updateData( detailedKey: string, summaryKey: string, data: DetailedData): Promise<void> {
@@ -431,11 +436,13 @@ export class MatchstickDbProvider implements OnDestroy {
     let community = new Community;
     community.name = name;
     community.permissions = 0;
-    this.afd.list('/communities').push(community);
+    this.afd.list('/communities').push(community).then( data => {
+      this.afd.object('/communitiesinfo/' + data.key).set({name: name});
+    });
   }
 
   getCommunityList(): Observable<any[]>  {
-    return this.afd.list('/communities').snapshotChanges().map(changes => {
+    return this.afd.list('/communitiesinfo').snapshotChanges().map(changes => {
       return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
     });
   }
