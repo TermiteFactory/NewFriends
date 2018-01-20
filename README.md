@@ -45,6 +45,27 @@ Go to Authentication -> Signin Method and enable the Email/Password authenticati
 
 After which you should go to the Templates method to customise the email templates your users will receive when they forget their password. Or are welcomed as a member. Or if you prefer them to validate their email, this is an option too. 
 
+### Push Notifications
+Push notifications require alot of configuration to set up. I followed this guide loosely to generate the certificates for IOS.
+
+https://www.djamware.com/post/58a1378480aca7386754130a/ionic-2-fcm-push-notification
+
+### Firebase Functions
+For push notification to work, we need to set the firebase functions.
+
+The steps can be found from the sample github:
+https://github.com/firebase/functions-samples/tree/master/fcm-notifications
+
+1. Create a Firebase Project using the Firebase Console.
+2. Enable Google Provider in the Auth section
+3. Clone or download this repo and open the fcm-notification directory.
+4. You must have the Firebase CLI installed. If you don't have it install it with npm install -g firebase-tools and then 5. configure it with firebase login.
+6. Configure the CLI locally by using firebase use --add and select your project in the list.
+7. Install dependencies locally by running: cd functions; npm install; cd -
+8. Deploy your project using firebase deploy
+9. Open the app using firebase open hosting:site, this will open a browser.
+10. Start following a user, this will send a notification to him.
+
 ## Building the App
 
 ### Install Pre Requisites
@@ -75,7 +96,7 @@ profiles/<profile uid>/superadmin
 
 ## Design Details 
 
-## Database Schema 
+### Database Schema 
 The database schema created automatically is as follows. 
 
 ```
@@ -96,6 +117,10 @@ communities
                 - <Summary ID>
                     - date: date of joining or addition 
                     - details_key: Value is the Person ID used by the persons list
+                    - followup_id: the id of the newcomer to follow up 
+                    - followup_name: the name displayed of the member following up
+                    - assign_id: the person who assigned this newcomer to a member
+                    - add_id: the id of the person added
                     ... (more details of the person)
         - name: Value is the name of this community
         - permissions
@@ -103,6 +128,10 @@ communities
                 - auth: Value is Member/Pending/Removed
                 - email: Value is the email of the person
                 - name: value is the name of the person
+        - messages
+            - sms: sms text
+            - emailsubject: subject of the email
+            - emailbody: body text of the email
 profiles
     - <Profile uid>
         - community: Value is the name of the community that has been joined (or "" if no joining)
@@ -110,3 +139,6 @@ profiles
 
 ```
 
+### Firebase Function code
+
+The code can be found firebase firebase_functions/index.ts

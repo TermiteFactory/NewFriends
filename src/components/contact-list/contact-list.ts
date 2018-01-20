@@ -39,8 +39,8 @@ export class ContactListComponent {
     let myname = this.authData.authState.getValue().displayName;
 
     let replace_data = (data: string): string => {
-      let newData = data.replace('{personname}', person.name);
-      return newData.replace('{myname}', myname);
+      let newData = data.replace(new RegExp('{personname}','g'), person.name);
+      return newData.replace(new RegExp('{myname}','g'), myname);
     };
 
     let email = {
