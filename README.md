@@ -153,23 +153,23 @@ The rules for the database are found here:
     "communities": {
       ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true",
       "$community": {
-        	"data": {
-						".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
-    				".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
-          },
-          "messages": {
-						".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
-    				".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
-          },
-          "name": {
+        "data": {
             ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
-    				".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
+            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
           },
-          "notify": {
+        "messages": {
+            ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
+            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
+          },
+        "name": {
+            ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
+            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
+          },
+        "notify": {
           	".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
-    				".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()"  
+            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()"  
           },
-          "permissions": {
+        "permissions": {
             ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true", 
           }	        
       }
