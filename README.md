@@ -31,11 +31,55 @@ The rules shall be configured as such:
 ```
 {
   "rules": {
-    ".read": "auth != null",
-    ".write": "auth != null"
+    "communities": {
+      ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true",
+      "$community": {
+        "data": {
+            ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
+            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
+          },
+        "messages": {
+            ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
+            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
+          },
+        "name": {
+            ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
+            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
+          },
+        "notify": {
+          	".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
+            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()"  
+          },
+        "permissions": {
+            ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true", 
+          }	        
+      }
+    },
+    "communitiesinfo": {
+      ".read": "auth != null",
+      ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true",
+    	"$communityinfo": {
+        "permissions": {
+          ".read": "auth != null",
+          ".write": "auth != null"   
+        }
+      }
+    },
+    "profiles": {
+      ".read": "auth != null",
+      "$profile": {
+        "community": {
+          ".write": "auth != null"
+        },
+      }
+    }
   }
 }
 ```
+
+### Initial Database 
+The database requires an initial setup. So please update the db with the following json file found in InitialDatabase.json. 
+You can do this from the firebase menu in real time database -> click on the options -> import json
 
 ### Firebase Authentication Settings
 The application uses the email authentication settings
@@ -65,6 +109,8 @@ https://github.com/firebase/functions-samples/tree/master/fcm-notifications
 8. Deploy your project using firebase deploy
 9. Open the app using firebase open hosting:site, this will open a browser.
 10. Start following a user, this will send a notification to him.
+
+The code can be found firebase firebase_functions/index.ts
 
 ## Building the App
 
@@ -149,59 +195,3 @@ communitiesinfo
 
 ```
 
-### Firebase Function code
-
-The code can be found firebase firebase_functions/index.ts
-
-### Firebase Rules:
-
-The rules for the database are found here:
-
-```
-{
-  "rules": {
-    "communities": {
-      ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true",
-      "$community": {
-        "data": {
-            ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
-            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
-          },
-        "messages": {
-            ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
-            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
-          },
-        "name": {
-            ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
-            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
-          },
-        "notify": {
-          	".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
-            ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()"  
-          },
-        "permissions": {
-            ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true", 
-          }	        
-      }
-    },
-    "communitiesinfo": {
-      ".read": "auth != null",
-      ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true",
-    	"$communityinfo": {
-        "permissions": {
-          ".read": "auth != null",
-          ".write": "auth != null"   
-        }
-      }
-    },
-    "profiles": {
-      ".read": "auth != null",
-      "$profile": {
-        "community": {
-          ".write": "auth != null"
-        },
-      }
-    }
-  }
-}
-```
