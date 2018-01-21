@@ -60,8 +60,12 @@ export class ContactListComponent {
             console.log('Email clicked');
             let sub1 = this.matchDb.getEmailSubject().subscribe( subject => {
               let sub2 = this.matchDb.getEmailBody().subscribe( body => {
-                email.subject = replace_data(subject);
-                email.body = replace_data(body);
+                if (subject!=null) {
+                  email.subject = replace_data(subject);
+                }
+                if (body!=null) {
+                  email.body = replace_data(body);
+                }
                 this.emailComposer.open(email).catch(()=> {});
                 sub2.unsubscribe();
               })
@@ -79,7 +83,10 @@ export class ContactListComponent {
           role: 'sms',
           handler: () => {
             let sub = this.matchDb.getSmsString().subscribe( data => {
-              let newData = replace_data(data);
+              let newData = "";
+              if (data != null) {
+                newData = replace_data(data);
+              }
               this.sms.send(person.phone, newData , {android: {intent: "INTENT"}}).catch(()=> {});
               sub.unsubscribe();
             })
