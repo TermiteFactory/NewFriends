@@ -94,6 +94,18 @@ Push notifications require alot of configuration to set up. I followed this guid
 
 https://www.djamware.com/post/58a1378480aca7386754130a/ionic-2-fcm-push-notification
 
+The steps are as follows:
+1. Log in to your apple developer account and go to Account > Certificates Identifiers and Profiles
+2. Click on iOS certificates and click on + button to add a certificate
+3. Click on Apple Push Notifiation Service (Under Development). Later you need to repeat the process for production
+4. Follow the instructions to generate a Certificate Signing Request 
+5. Generate a certificate and download it
+6. Repeat the steps for Production ceritificate
+7. On a Mac OS, you can double click on each of the certificates and then export it as a p12 certificate
+8. When prompted add a password to protect the certificate
+9. Go to the Firebase and go to settings 
+10. Click on Cloud Messaging and upload both the p12 APN certificates 
+
 ### Firebase Functions
 For push notification to work, we need to set the firebase functions.
 
