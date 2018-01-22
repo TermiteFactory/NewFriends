@@ -122,7 +122,7 @@ npm install -g firebase-tools
     Javascript
     TypeScript. See Write Functions with TypeScript for more information.
 
-After this is done, replace the functions/index.ts with the following file: firebase_functions/index.ts
+After this is done, replace the functions/src/index.ts with the following file: firebase_functions/index.ts
 
 ## Building the App
 
