@@ -32,7 +32,7 @@ The rules shall be configured as such:
 {
   "rules": {
     "communities": {
-      ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true",
+      ".write": "root.child('superadmin').child(auth.uid).val() == true",
       "$community": {
         "data": {
             ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
@@ -51,13 +51,13 @@ The rules shall be configured as such:
             ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()"  
           },
         "permissions": {
-            ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true", 
+            ".write": "root.child('superadmin').child(auth.uid).val() == true", 
           }	        
       }
     },
     "communitiesinfo": {
       ".read": "auth != null",
-      ".write": "root.child('profiles').child(auth.uid).child('superadmin').val() == true",
+      ".write": "root.child('superadmin').child(auth.uid).val() == true",
     	"$communityinfo": {
         "permissions": {
           ".read": "auth != null",
@@ -67,11 +67,10 @@ The rules shall be configured as such:
     },
     "profiles": {
       ".read": "auth != null",
-      "$profile": {
-        "community": {
-          ".write": "auth != null"
-        },
-      }
+      ".write": "auth != null"
+    },
+    "superadmin": {
+      ".read": "auth != null"
     }
   }
 }
