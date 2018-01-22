@@ -108,20 +108,21 @@ The steps are as follows:
 ### Firebase Functions
 For push notification to work, we need to set the firebase functions.
 
-The steps can be found from the sample github:
-https://github.com/firebase/functions-samples/tree/master/fcm-notifications
+The steps can be found from the following site
+https://firebase.google.com/docs/functions/get-started?authuser=0
 
-1. Create a Firebase Project using the Firebase Console.
-2. Enable Google Provider in the Auth section
-3. Clone or download this repo and open the fcm-notification directory.
-4. You must have the Firebase CLI installed. If you don't have it install it with npm install -g firebase-tools and then 5. configure it with firebase login.
-6. Configure the CLI locally by using firebase use --add and select your project in the list.
-7. Install dependencies locally by running: cd functions; npm install; cd -
-8. Deploy your project using firebase deploy
-9. Open the app using firebase open hosting:site, this will open a browser.
-10. Start following a user, this will send a notification to him.
+As a pre-requisite:
+npm install -g firebase-tools
 
-The code can be found firebase firebase_functions/index.ts
+0. Create a fresh directory. 
+1. Run firebase login to log in via the browser and authenticate the firebase tool.
+2. Go to your Firebase project directory.
+3. Run firebase init functions. The tool gives you an option to install dependencies with npm. It is safe to decline if you want to manage dependencies in another way.
+4. The tool gives you two options for language support:
+    Javascript
+    TypeScript. See Write Functions with TypeScript for more information.
+
+After this is done, replace the functions/index.ts with the following file: firebase_functions/index.ts
 
 ## Building the App
 
