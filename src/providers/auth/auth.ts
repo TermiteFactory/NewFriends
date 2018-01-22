@@ -27,21 +27,38 @@ export class AuthProvider implements OnDestroy {
 
     this.profileObservable = Observable.create((observer) => {
       let profileSub: Subscription;
+      let superadminSub: Subscription;
       let authSub: Subscription;
 
       authSub = this.afAuth.authState.subscribe((auth) => {
         if (auth!=null) {
+          let profileUid: ProfileUid = new ProfileUid;
+          
           profileSub = this.afd.object<Profile>('/profiles/' + auth.uid).valueChanges().subscribe( (profile) => {
-            let profileUid: ProfileUid = new ProfileUid;
             profileUid.assign(profile);
             profileUid.uid = auth.uid;
             observer.next(profileUid);
           });
+
+          superadminSub = this.afd.object<boolean>('/superadmin/' + auth.uid).valueChanges().subscribe( (superadmin) => {
+            if (superadmin == true) {
+              profileUid.superadmin = true;
+            } else {
+              profileUid.superadmin = false;
+            }
+            if (profileUid.uid!="") {
+              observer.next(profileUid);
+            }
+          });
+
         } else {
           observer.next(null);
           
           if (profileSub!=null) {
             profileSub.unsubscribe();
+          }
+          if (superadminSub!=null) {
+            superadminSub.unsubscribe();
           }
         }
       });
@@ -100,18 +117,17 @@ export class AuthProvider implements OnDestroy {
 
 export class Profile {
   community: string = "";
-  superadmin: boolean = false;
 
   constructor() {
   }
 }
 
 export class ProfileUid extends Profile {
-  uid: string;
+  uid: string = "";
+  superadmin: boolean = false;
 
   assign(superClass: Profile) {
     this.community = superClass.community;
-    this.superadmin = superClass.superadmin
   }
 
   constructor() {
