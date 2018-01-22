@@ -46,7 +46,7 @@ The rules shall be configured as such:
             ".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
             ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()" 
           },
-        "notify": {
+        "notifytokens": {
           	".read": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()",
             ".write": "true == root.child('communities').child($community).child('permissions').child(auth.uid).val()"  
           },
