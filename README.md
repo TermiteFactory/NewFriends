@@ -148,8 +148,10 @@ Upon initiation of the database, you will need to make 1 or more users a SuperAd
 Making someone SuperAdmin can only be done via the firebase console and cannot be done via the App.
 To do so, you need to change the field found in the following path to 'true'
 
+(Note that you have to create the superadmin node manually and add the correct profile uid child and set the value to true)
+
 ```
-profiles/<profile uid>/superadmin
+superadmin/<profile uid> = true
 ```
 
 ## Design Details 
@@ -192,7 +194,9 @@ communities
 profiles
     - <Profile uid>
         - community: Value is the name of the community that has been joined (or "" if no joining)
-        - superadmin: true if this is a super admin, or false otherwise.
+
+superadmin: 
+    - <Profile uid>: true if this is a super admin, or false otherwise.
 
 communitiesinfo
     - <Community ID>
