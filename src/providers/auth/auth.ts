@@ -30,7 +30,7 @@ export class AuthProvider implements OnDestroy {
       let superadminSub: Subscription;
       let authSub: Subscription;
 
-      authSub = this.afAuth.authState.subscribe((auth) => {
+      authSub = this.authState.subscribe((auth) => {
         if (auth!=null) {
           let profileUid: ProfileUid = new ProfileUid;
           
@@ -52,14 +52,13 @@ export class AuthProvider implements OnDestroy {
           });
 
         } else {
-          observer.next(null);
-          
           if (profileSub!=null) {
             profileSub.unsubscribe();
           }
           if (superadminSub!=null) {
             superadminSub.unsubscribe();
           }
+          observer.next(null);
         }
       });
       // Return Unsubscribe function
@@ -101,7 +100,7 @@ export class AuthProvider implements OnDestroy {
   }
 
   addProfileData(name: string) {
-    let sub: Subscription = this.afAuth.authState.subscribe(auth => {
+    let sub: Subscription = this.authState.subscribe(auth => {
       auth.updateProfile({displayName: name, photoURL: null});
       sub.unsubscribe();
     });

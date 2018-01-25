@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AuthProvider } from '../../providers/auth/auth';
+import { AuthProvider, ProfileUid } from '../../providers/auth/auth';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireObject, QueryFn } from 'angularfire2/database/interfaces';
 import { Observable } from 'rxjs/Observable';
@@ -10,6 +10,7 @@ import { FCM } from '@ionic-native/fcm';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { Storage } from '@ionic/storage';
 import { Platform } from 'ionic-angular';
+import { auth } from 'firebase/app';
 
 /*
   Generated class for the MatchstickDbProvider provider.
@@ -23,8 +24,13 @@ export class MatchstickDbProvider implements OnDestroy {
   communityState: BehaviorSubject<JoinData | null>;
   newcomerNotify: BehaviorSubject<boolean>;
   newcomerAssigned: BehaviorSubject<boolean>;
+  validAuth: BehaviorSubject<boolean>;
 
-  private previousState: JoinData;
+  private registeredState: JoinData;
+  private registeredProfile: ProfileUid;
+  private assignRegistered: boolean;
+  private newRegistered: boolean;
+
   private profileSub1: Subscription;
   private profileSub2: Subscription;
   private stateSub: Subscription;
@@ -42,13 +48,20 @@ export class MatchstickDbProvider implements OnDestroy {
     this.stateSub = null;
     this.nameSub = null;
     this.communityState = new BehaviorSubject(null);
-    this.previousState = null;
-      
-    this.profileSub1 = this.authData.profile.subscribe( (profileUid) => {
-      let SetBehaviorSub = (value) => {
-        this.previousState = this.communityState.getValue();
-        this.communityState.next(value);
+
+    this.registeredState = null;
+    this.registeredProfile = null;
+    this.assignRegistered = false;
+    this.newRegistered = false;
+
+    this.validAuth = new BehaviorSubject(false);
+    authData.authState.subscribe( (state) => {
+      if (state!=null) {
+        this.validAuth.next(true);
       }
+    });
+    
+    this.profileSub1 = this.authData.profile.subscribe( (profileUid) => {
 
       if (this.stateSub != null) {
         this.stateSub.unsubscribe();
@@ -57,7 +70,7 @@ export class MatchstickDbProvider implements OnDestroy {
         this.nameSub.unsubscribe();
       }
       if (profileUid == null || profileUid.community == "") {
-        SetBehaviorSub(null);
+        this.communityState.next(null);
       }
       else {
         let currentData: JoinData = new JoinData;
@@ -65,14 +78,14 @@ export class MatchstickDbProvider implements OnDestroy {
           currentData.communityName = name;
           currentData.communityId = profileUid.community;
           if (currentData.joinState != "Invalid") {
-            SetBehaviorSub(currentData);
+            this.communityState.next(currentData);
           }
         });
         this.stateSub = this.afd.object<Permission>('/communitiesinfo/' + profileUid.community + '/permissions/' + profileUid.uid).valueChanges().subscribe( (state) => {
           if (state!=null) {
             currentData.joinState = state.auth;
             if (currentData.communityName != "Invalid" && currentData.communityId != "Invalid" ) {
-              SetBehaviorSub(currentData);
+              this.communityState.next(currentData);
             }
           }
         }); 
@@ -123,11 +136,7 @@ export class MatchstickDbProvider implements OnDestroy {
 
       } else {
         // Remove previous tokens
-        if (this.previousState!=null && this.previousState.joinState== "Member") {
-          this.afd.object('/communitiesinfo/' + this.previousState.communityId + '/notifytokens/'+ this.token).remove();
-          let profileuid = this.authData.profile.getValue();
-          this.afd.object('/communitiesinfo/' + this.previousState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
-        }
+        this.removeTokens();
       }
     });
 
@@ -153,6 +162,26 @@ export class MatchstickDbProvider implements OnDestroy {
         console.log('onNotification Error');
       });
     });
+  }
+
+  pendingSignout() {
+    this.validAuth.next(false);
+    this.removeTokens();
+  }
+
+  removeTokens() {
+    if (this.registeredState!=null) {
+      if (this.newRegistered) {
+        this.afd.object('/communities/' + this.registeredState.communityId + '/notifytokens/'+ this.token).remove();
+        this.newRegistered = false;
+      }
+      if (this.registeredProfile!=null) {
+        if (this.assignRegistered) {
+          this.afd.object('/communitiesinfo/' + this.registeredState.communityId + '/permissions/'+ this.registeredProfile.uid + '/notifytokens/' + this.token).remove();
+          this.assignRegistered = false;
+        }
+      }
+    }
   }
 
   // Listens to the change in profiles and will add the uid to the community when necessary 
@@ -230,10 +259,13 @@ export class MatchstickDbProvider implements OnDestroy {
     let joinState = this.communityState.getValue();
     if (joinState != null && joinState.joinState == "Member") {
       if (notify==true) {
+        this.registeredState = joinState;
+        this.newRegistered = true;
         this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).set(true);
       }
       else {
         this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).remove();
+        this.newRegistered = false;
       }
     }
   }
@@ -249,10 +281,14 @@ export class MatchstickDbProvider implements OnDestroy {
     if (joinState != null && joinState.joinState == "Member") {
       let profileuid = this.authData.profile.getValue();
       if (notify==true) {
+        this.registeredState = joinState;
+        this.registeredProfile = profileuid;
+        this.assignRegistered = true;
         this.afd.object('/communitiesinfo/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).set(true);
       }
       else {
         this.afd.object('/communitiesinfo/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
+        this.assignRegistered = false;
       }
     }
   }

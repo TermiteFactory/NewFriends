@@ -38,6 +38,14 @@ export class NewComersPage implements OnDestroy {
           loading = null;
         }
      });
+
+     this.matchDb.validAuth.subscribe((state) => {
+       if (state == false) {
+          if (this.sub!=null) {
+            this.sub.unsubscribe();
+          }
+       }
+     })
   }
 
   addNewcomer() {
@@ -62,7 +70,9 @@ export class NewComersPage implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    if (this.sub!=null) {
+      this.sub.unsubscribe();
+    }
   }
 
 }

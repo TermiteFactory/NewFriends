@@ -38,9 +38,9 @@ export class SettingsPage implements OnDestroy {
   }
 
   logoutUser() {
-    this.authData.logoutUser().then( () => {
-      this.app.getRootNav().setRoot('LoginPage');
-    });
+    this.matchDb.pendingSignout();
+    this.app.getRootNav().setRoot('LoginPage');
+    this.authData.logoutUser();
   }
 
   communityPrompt() {
