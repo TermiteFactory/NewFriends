@@ -29,21 +29,21 @@ export class NewComersPage implements OnDestroy {
     });
     loading.present();
 
-    this.sub = matchDb.getSummaryList(ref=>ref.orderByChild("date")).subscribe( data => {
-        this.originalSummaryList = data;
-        this.setFilteredItems();
-        
-        if (loading!=null) {
-          loading.dismiss();
-          loading = null;
-        }
-     });
-
      this.matchDb.validAuth.subscribe((state) => {
        if (state == false) {
           if (this.sub!=null) {
             this.sub.unsubscribe();
           }
+       } else {
+        this.sub = matchDb.getSummaryList(ref=>ref.orderByChild("date")).subscribe( data => {
+          this.originalSummaryList = data;
+          this.setFilteredItems();
+          
+          if (loading!=null) {
+            loading.dismiss();
+            loading = null;
+          }
+        });
        }
      })
   }

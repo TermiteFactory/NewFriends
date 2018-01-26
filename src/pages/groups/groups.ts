@@ -38,26 +38,26 @@ export class GroupsPage implements OnDestroy{
     });
     loading.present();
 
-    this.sub = matchDb.getSummaryList().subscribe( people => {
-      this.groupsListing.forEach(listing => listing.count = 0);
-      people.forEach( person => {
-         this.groupsListing.forEach(listing => {
-            if (person[listing.tag] == true) { 
-              listing.count = listing.count + 1;
-            };
-         });
-      })
-      if (loading!=null) {
-        loading.dismiss();
-        loading = null
-      }
-    });
-
     this.matchDb.validAuth.subscribe((state) => {
       if (state == false) {
         if (this.sub!=null) {
           this.sub.unsubscribe();
         }
+      } else {
+        this.sub = matchDb.getSummaryList().subscribe( people => {
+          this.groupsListing.forEach(listing => listing.count = 0);
+          people.forEach( person => {
+             this.groupsListing.forEach(listing => {
+                if (person[listing.tag] == true) { 
+                  listing.count = listing.count + 1;
+                };
+             });
+          })
+          if (loading!=null) {
+            loading.dismiss();
+            loading = null
+          }
+        });
       }
     })
   }
