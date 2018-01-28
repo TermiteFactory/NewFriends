@@ -101,8 +101,10 @@ export class AuthProvider implements OnDestroy {
 
   addProfileData(name: string) {
     let sub: Subscription = this.authState.subscribe(auth => {
-      auth.updateProfile({displayName: name, photoURL: null});
-      sub.unsubscribe();
+      if (auth!=null) {
+        auth.updateProfile({displayName: name, photoURL: null});
+        sub.unsubscribe();
+      }
     });
   }
 
