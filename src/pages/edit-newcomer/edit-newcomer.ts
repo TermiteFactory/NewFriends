@@ -49,10 +49,26 @@ export class EditNewcomerPage implements OnDestroy{
   }
 
   submitEdit() {
+    let loading = this.loadingCtrl.create({
+      content: 'Updating...'
+    });
+    loading.present();
     this.matchDb.updateData(this.navParams.data.newcomerkey, 
                             this.navParams.data.summarykey, 
-                            this.local_data);
-    this.navCtrl.pop();
+                            this.local_data)
+      .then(() => {
+        if (loading!=null) {
+          loading.dismiss();
+          loading = null
+        }
+        this.navCtrl.pop();
+      }, () => {
+        if (loading!=null) {
+          loading.dismiss();
+          loading = null
+        }
+        this.navCtrl.popToRoot();
+      });
   }
 
   undoEdit() {

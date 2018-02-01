@@ -9,7 +9,7 @@ import { OnDestroy } from '@angular/core';
 import { FCM } from '@ionic-native/fcm';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { Storage } from '@ionic/storage';
-import { Platform } from 'ionic-angular';
+import { Platform, AlertController } from 'ionic-angular';
 import { auth } from 'firebase/app';
 
 /*
@@ -40,7 +40,7 @@ export class MatchstickDbProvider implements OnDestroy {
   private token: string;
 
   constructor(public authData: AuthProvider, public afd:AngularFireDatabase, private fcm: FCM, 
-    private localNotifications: LocalNotifications, private storage: Storage,
+    private localNotifications: LocalNotifications, private storage: Storage, private alertCtrl: AlertController,
     public plt: Platform) {
     
     this.addUidToPermissions();
@@ -317,13 +317,26 @@ export class MatchstickDbProvider implements OnDestroy {
   updateData( detailedKey: string, summaryKey: string, data: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
       let joinState = this.communityState.getValue();
-      this.getPersonDetailsRef(detailedKey, joinState.communityId).update(data).then(() => {
-        let summarydata = new SummaryData;
-        this.copyToSummary(data, summarydata);
-        this.getSummaryRef(summaryKey, joinState.communityId).update(summarydata).then( () => {
-          resolve();
-        }, () => reject);
-      }, () => reject);    
+      let sub = this.getSummaryRef(summaryKey, joinState.communityId).valueChanges().subscribe( curr_summ_data => {
+        sub.unsubscribe();
+        if (curr_summ_data != null) {
+          this.getPersonDetailsRef(detailedKey, joinState.communityId).update(data).then(() => {
+            let summarydata = new SummaryData;
+            this.copyToSummary(data, summarydata);
+            this.getSummaryRef(summaryKey, joinState.communityId).update(summarydata).then( () => {
+              resolve();
+            }, () => reject);
+          }, () => reject);  
+        } else {
+          let alert = this.alertCtrl.create({
+            title: 'Edit Failed',
+            subTitle: 'Person has been removed from the database',
+            buttons: ['Dismiss']
+          });
+          reject();
+          alert.present();
+        }
+      });  
     });    
   }
   
