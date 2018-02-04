@@ -57,10 +57,15 @@
       <button ion-button outline item-end [disabled]="!(authData.profile | async)?.superadmin" (click)="communityPrompt()">Add Community</button>
     </ion-item>
     <ng-container *ngIf="(authData.profile | async)?.superadmin" >
-        <ion-list-header color="light">Member Management</ion-list-header>
-        <ion-item *ngFor="let permission of permissions | async">
+        <ion-list-header color="light">Membership Approval</ion-list-header>
+        <ion-item *ngFor="let permission of permissions | async | memberFilter:'Pending'">
             <ion-label>{{permission.name}} ({{permission.email}})</ion-label>
-            <button ion-button outline item-end (click)="memberAction(permission)">{{permission.auth=='Member'?'Remove':'Approve'}}</button> 
+            <button ion-button outline item-end (click)="memberAction(permission)">Approve</button>    
+        </ion-item>
+        <ion-list-header color="light">Member Management</ion-list-header>
+        <ion-item *ngFor="let permission of permissions | async | memberFilter:'Member'">
+            <ion-label>{{permission.name}} ({{permission.email}})</ion-label>
+            <button ion-button outline item-end (click)="memberAction(permission)">Remove</button>    
         </ion-item>
     </ng-container>
   </ion-list>

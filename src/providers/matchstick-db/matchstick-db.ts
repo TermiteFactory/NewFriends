@@ -92,13 +92,6 @@ export class MatchstickDbProvider implements OnDestroy {
       }
     });
 
-    // Get the current token
-    fcm.getToken().then( token => {
-      this.token = token;
-    }).catch( () => {
-      this.token = '1234567';
-    });
-
     // Init the values
     this.newcomerNotify = new BehaviorSubject(true);
     this.newcomerAssigned = new BehaviorSubject(true);
@@ -123,6 +116,7 @@ export class MatchstickDbProvider implements OnDestroy {
     // Handle the case where the token can change after an OS upgrade
     // Just set the DB on change as there is no change in behavior subject
     this.tokenSub = this.fcm.onTokenRefresh().subscribe( () => {
+      this.getToken(); // Refresh the token again
       this.updateNotifyNewDB(this.newcomerNotify.getValue());
       this.updateNotifyAssignedDB(this.newcomerAssigned.getValue());
     }, error => {});
@@ -144,6 +138,9 @@ export class MatchstickDbProvider implements OnDestroy {
     plt.ready().then( () => {
       console.log('Platform is ready. Starting to subscribe for notifications');
 
+      // Obtain the token upon startup
+      this.getToken();
+
       // Register for notification callback
       this.notifySub = fcm.onNotification().subscribe( data => {
         console.log('onNotification Callback');
@@ -161,6 +158,15 @@ export class MatchstickDbProvider implements OnDestroy {
       }, error => {
         console.log('onNotification Error');
       });
+    });
+  }
+
+  getToken() {
+    // Get the current token
+    this.fcm.getToken().then( token => {
+      this.token = token;
+    }).catch( () => {
+      this.token = '1234567';
     });
   }
 
