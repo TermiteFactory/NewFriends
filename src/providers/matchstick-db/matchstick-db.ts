@@ -308,6 +308,15 @@ export class MatchstickDbProvider implements OnDestroy {
     });
   }
 
+  updateFollowupStatus(summaryKey: string, followup_status: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let joinState = this.communityState.getValue();
+      this.getSummaryRef(summaryKey, joinState.communityId).update({followup_state: followup_status}).then( () => {
+        resolve();
+      }, () => reject);
+    });
+  }
+
   updatePermission(permissionKey: string, authState: string) {
     let joinState = this.communityState.getValue();
     if (authState == "Member") {
@@ -397,6 +406,7 @@ export class MatchstickDbProvider implements OnDestroy {
     to.tag_nocontact = from.tag_nocontact;
     to.email = from.email;
     to.phone = from.phone;
+    to.description = from.description;
   }
 
   getPermissionsList(): Observable<any[]> {
@@ -464,6 +474,22 @@ export class MatchstickDbProvider implements OnDestroy {
       return () => {
         if (detailedSub!=null) {
           detailedSub.unsubscribe();
+        } 
+      }
+    });
+  }
+
+  getSummary(summaryKey: string) : Observable<any> {
+    return Observable.create( (observer) => {
+      let joinState = this.communityState.getValue();
+      // Register for the detailed state to get updates
+      let summarySub = this.getSummaryRef(summaryKey, joinState.communityId).valueChanges().subscribe( (summary) => {
+        observer.next(summary);
+      });        
+      // Unsubscribe callback
+      return () => {
+        if (summarySub!=null) {
+          summarySub.unsubscribe();
         } 
       }
     });
@@ -574,6 +600,7 @@ export class SummaryData {
   tag_nocontact: boolean = false;
   email: string = "";
   phone: string = "";
+  description: string ="";
 
   constructor() {
   }
@@ -595,6 +622,7 @@ export class SummaryDataKey extends SummaryData {
   followup_id: string = "";  
   assign_id: string ="";
   add_id: string ="";
+  followup_state: string ="";
 
   constructor() {
     super();
@@ -626,6 +654,7 @@ export class DetailedData {
   tag_cvl: boolean = false;
   tag_pastor: boolean = false;
   tag_nocontact: boolean = false;
+  description: string ="";
 
   constructor() {
   }

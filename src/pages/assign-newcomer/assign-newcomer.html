@@ -18,10 +18,12 @@
 
 <ion-content padding>
   <ion-list>
+      <ion-list-header icon-left color="light"><ion-icon name="body"></ion-icon>Assign for Followup</ion-list-header>
       <ng-container *ngFor="let member of members | async">
           <ion-item *ngIf="member.auth=='Member'">
-              <ion-label>{{member.name}} ({{member.email}})</ion-label>
-              <button ion-button outline item-end (click)="assignMember(member)">Assign</button> 
+              {{member.name}} ({{member.email}})
+              <button *ngIf="(summary|async)?.followup_id!=member.key;else display_assigned" ion-button outline item-end (click)="assignMember(member)">Assign</button> 
+              <ng-template #display_assigned><p>Assigned</p></ng-template>  
           </ion-item>
       </ng-container>
   </ion-list>

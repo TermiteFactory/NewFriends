@@ -3,11 +3,25 @@
 <ion-list-header *ngIf="person.header">
   <ion-datetime disabled displayFormat="DDD D MMM YYYY" [ngModel]="person.title"></ion-datetime>
 </ion-list-header>
-<ion-item *ngIf="!person.header" (click)="showDetails()" detail-push> 
-  {{person.name}} 
-  <button *ngIf="person.followup_name==''" ion-button outline item-end (click)="assignNewcomer($event)">Assign</button>  
+<ion-item-sliding *ngIf="!person.header">
+    <ion-item (click)="showDetails()" detail-push> 
+        <h2>{{person.name}}</h2>
+        <p>{{person.description}}</p>
+        <ion-icon small [color]="state_color" [name]="state_icon" item-end></ion-icon>
+    </ion-item>
+    <ion-item-options side="right">
+      <button item-end ion-button  (click)="assignStatus($event)"color="grey">
+        <ion-icon name="git-branch"></ion-icon>
+        Status
+      </button>
+      <button *ngIf="person.followup_name==''" item-end (click)="assignNewcomer($event)" ion-button color="primary">
+        <ion-icon name="body"></ion-icon>
+        Assign
+      </button>
+      <button *ngIf="person.followup_name!=''" item-end (click)="assignNewcomer($event)" ion-button color="secondary">
+        <ion-icon name="heart"></ion-icon>
+         {{person.followup_name}}
+        </button>
+    </ion-item-options>
+</ion-item-sliding>
 
-  <ion-note *ngIf="person.followup_name!=''" item-end (click)="assignNewcomer($event)">
-      <ion-icon small name="heart"></ion-icon> by {{person.followup_name}}
-  </ion-note>  
-</ion-item>

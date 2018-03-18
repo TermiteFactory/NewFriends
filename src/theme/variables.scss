@@ -38,7 +38,8 @@ $colors: (
   secondary:  #32db64,
   danger:     #f53d3d,
   light:      #f4f4f4,
-  dark:       #222
+  dark:       #222,
+grey:       #d3d3d3,
 );
 
 
@@ -46,17 +47,19 @@ $colors: (
 // --------------------------------------------------
 // iOS only Sass variables can go here
 
-
+$item-ios-detail-push-color: color($colors, primary);
 
 
 // App Material Design Variables
 // --------------------------------------------------
 // Material Design only Sass variables can go here
 
+$item-md-detail-push-show: true;
+$item-md-detail-push-color: color($colors, primary);
 
 
 
-// App Windows Variables
+// App Windows Variables  
 // --------------------------------------------------
 // Windows only Sass variables can go here
 

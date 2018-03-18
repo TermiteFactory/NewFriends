@@ -12,9 +12,33 @@ import { NavController } from 'ionic-angular';
   templateUrl: 'bydate-newcomers.html'
 })
 export class BydateNewcomersComponent {
-  @Input() person;
+  state_color: string;
+  state_icon: string;
+  person: any;
 
   constructor(public navCtrl: NavController) {
+  }
+
+  @Input() 
+  set inputperson(data: any) {
+    this.person = data;
+    if (this.person.followup_name!="") {
+      this.state_color = "secondary";
+    } else {
+      this.state_color = "grey";
+    }
+    
+    if (this.person.followup_state == "GetDetails") {
+      this.state_icon = "search";
+    } else if (this.person.followup_state == "GetIndication") {
+      this.state_icon = "time";
+    } else if (this.person.followup_state == "LinkUp") {
+      this.state_icon = "checkbox";
+    } else if (this.person.followup_state == "NoFollowup") {
+      this.state_icon = "hand";
+    } else {
+      this.state_icon = "search";
+    }
   }
 
   showDetails() {
@@ -23,10 +47,15 @@ export class BydateNewcomersComponent {
   }
 
   assignNewcomer(event: any) {
-    event.stopPropagation();
     this.navCtrl.push("AssignNewcomerPage", { summarykey: this.person.key,
                                               name: this.person.name,
                                               current: this.person.followup_name});
+  }
+
+  assignStatus(event: any) {
+    this.navCtrl.push("AssignStatusPage", { summarykey: this.person.key,
+                                            name: this.person.name,
+                                            current: this.person.followup_name});
   }
 
 }

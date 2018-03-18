@@ -8,95 +8,95 @@
 
   <ion-navbar>
     <ion-title>{{local_data.name}}</ion-title>
-    <ion-buttons end>
-      <button ion-button icon-left (click)="editNewcomer()">
-        <ion-icon name="create"></ion-icon>Edit Details</button>
-    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
 <ion-content padding>
-  <ion-card>
-    <ion-card-header>
-      Details
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item>
-          <ion-label color="primary" stacked>Name</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.name"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" stacked>Visited On</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.dateVisited"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" stacked>Came With</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.cameWith"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" stacked>Age</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.age"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" stacked>Phone</ion-label>
-          <ion-input readonly type="tel" [ngModel]="local_data.phone"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" stacked>Email</ion-label>
-          <ion-input readonly type="email" [ngModel]="local_data.email"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" stacked>Religion</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.religion"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" stacked>Purpose for Visit</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.purpose"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" stacked>Visited Before?</ion-label>
-          <ion-input readonly type="text" [ngModel]="local_data.visitedBefore"></ion-input>
-        </ion-item>
-        <ion-item>
-            <ion-label color="primary" stacked>{{local_data.name}} would like to:</ion-label>
-        </ion-item>
-        <ion-item *ngIf="local_data.tag_alpha">
-            <ion-icon item-start name="checkbox" small></ion-icon>
-            <ion-label>Learn about Alpha</ion-label>
-        </ion-item>
-        <ion-item *ngIf="local_data.tag_connect">
-            <ion-icon item-start name="checkbox" small></ion-icon>
-            <ion-label>Learn about Connect/Cell Group</ion-label>
-        </ion-item>
-        <ion-item *ngIf="local_data.tag_churchschool">
-            <ion-icon item-start name="checkbox" small></ion-icon>
-            <ion-label>Learn Church School/XS</ion-label>
-        </ion-item>
-        <ion-item *ngIf="local_data.tag_yam">
-            <ion-icon item-start name="checkbox" small></ion-icon>
-            <ion-label>Learn about YAM</ion-label>
-        </ion-item>
-        <ion-item *ngIf="local_data.tag_cvl">
-            <ion-icon item-start name="checkbox" small></ion-icon>
-            <ion-label>Learn about CVL</ion-label>
-        </ion-item>
-        <ion-item *ngIf="local_data.tag_pastor">
-            <ion-icon item-start name="checkbox" small></ion-icon>
-            <ion-label>Speak to Pastor</ion-label>
-        </ion-item>
-        <ion-item *ngIf="local_data.tag_nocontact">
-            <ion-icon item-start name="checkbox" small></ion-icon>
-            <ion-label>Do not Contact</ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+  <ion-list>
+    <ion-list-header color="light">Details
+          <button ion-button icon-left (click)="editNewcomer()" outline item-end>Edit</button>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-label color="primary">Visited On</ion-label>
+      <ion-input readonly type="text" [ngModel]="local_data.dateVisited" text-right></ion-input>
+    </ion-item>
+
+    <ion-item>
+        <ion-label color="primary">Visited On</ion-label>
+        <ion-datetime  readonly displayFormat="DDD D MMM YYYY" [ngModel]="local_data.dateVisited" text-right ></ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked color="primary">Description</ion-label>
+      <ion-textarea fz-elastic readonly rows="1" type="text" [ngModel]="local_data.description"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Came With</ion-label>
+      <ion-input readonly type="text" [ngModel]="local_data.cameWith" text-right></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Age</ion-label>
+      <ion-input readonly type="text" [ngModel]="local_data.age" text-right></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Phone</ion-label>
+      <ion-input readonly type="tel" [ngModel]="local_data.phone" text-right></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Email</ion-label>
+      <ion-input readonly type="email" [ngModel]="local_data.email" text-right></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Religion</ion-label>
+      <ion-input readonly type="text" [ngModel]="local_data.religion" text-right></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Purpose for Visit</ion-label>
+      <ion-input readonly type="text" [ngModel]="local_data.purpose" text-right></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Visited Before?</ion-label>
+      <ion-input readonly type="text" [ngModel]="local_data.visitedBefore" text-right></ion-input>
+    </ion-item>
+    <ion-list-header color="light">Follow-Up Indications
+        <button ion-button icon-left (click)="editNewcomer()" outline item-end>Edit</button>
+    </ion-list-header>
+    <ion-item *ngIf="local_data.tag_alpha">
+        <ion-icon item-start name="checkbox" small></ion-icon>
+        <ion-label>Learn about Alpha</ion-label>
+    </ion-item>
+    <ion-item *ngIf="local_data.tag_connect">
+        <ion-icon item-start name="checkbox" small></ion-icon>
+        <ion-label>Learn about Connect/Cell Group</ion-label>
+    </ion-item>
+    <ion-item *ngIf="local_data.tag_churchschool">
+        <ion-icon item-start name="checkbox" small></ion-icon>
+        <ion-label>Learn Church School/XS</ion-label>
+    </ion-item>
+    <ion-item *ngIf="local_data.tag_yam">
+        <ion-icon item-start name="checkbox" small></ion-icon>
+        <ion-label>Learn about YAM</ion-label>
+    </ion-item>
+    <ion-item *ngIf="local_data.tag_cvl">
+        <ion-icon item-start name="checkbox" small></ion-icon>
+        <ion-label>Learn about CVL</ion-label>
+    </ion-item>
+    <ion-item *ngIf="local_data.tag_pastor">
+        <ion-icon item-start name="checkbox" small></ion-icon>
+        <ion-label>Speak to Pastor</ion-label>
+    </ion-item>
+    <ion-item *ngIf="local_data.tag_nocontact">
+        <ion-icon item-start name="checkbox" small></ion-icon>
+        <ion-label>Do not Contact</ion-label>
+    </ion-item>
+    <ion-list-header color="light">Notes</ion-list-header>
+  </ion-list>
 
   <ion-card *ngFor="let note of notes">
     <ng-container *ngIf="(editNoteKey | async) != note.key">
       <ion-card-content>
-        <p>{{note.text}}</p>
+        <div class="text-content">{{note.text}}</div>
       </ion-card-content>
       <ion-row>
         <ion-col center text-center>
@@ -125,7 +125,7 @@
     <ng-container *ngIf="(editNoteKey | async) == note.key">
       <ion-card-content>
         <ion-item>
-            <ion-textarea #editElement clearInput="true" type="text" [ngModel]="note.text"></ion-textarea>
+            <ion-textarea fz-elastic #editElement clearInput="true" type="text" [ngModel]="note.text"></ion-textarea>
         </ion-item>
       </ion-card-content>
       <ion-row>
@@ -154,7 +154,7 @@
   <ion-card>
       <ion-card-content>
         <ion-item>
-            <ion-textarea #commentElement placeholder="Type in followup comments here" clearInput="true" type="text"></ion-textarea>
+            <ion-textarea fz-elastic #commentElement placeholder="Type in followup comments here" clearInput="true" type="text"></ion-textarea>
         </ion-item>
       </ion-card-content>
       <ion-buttons end>

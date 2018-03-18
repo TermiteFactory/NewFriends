@@ -5,7 +5,7 @@ import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-d
 import { AuthProvider } from '../../providers/auth/auth';
 
 /**
- * Generated class for the AssignNewcomerPage page.
+ * Generated class for the AssignStatusPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
@@ -13,13 +13,18 @@ import { AuthProvider } from '../../providers/auth/auth';
 
 @IonicPage()
 @Component({
-  selector: 'page-assign-newcomer',
-  templateUrl: 'assign-newcomer.html',
+  selector: 'page-assign-status',
+  templateUrl: 'assign-status.html',
 })
-export class AssignNewcomerPage {
+export class AssignStatusPage {
 
   members: Observable<any[]>;
   summary: Observable<any>;
+
+  get_details: string = "GetDetails";
+  get_indication: string = "GetIndication";
+  link_up: string = "LinkUp";
+  no_followup: string = "NoFollowup";
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider, public authData: AuthProvider) {
     this.members = matchDb.getPermissionsList();
@@ -27,17 +32,11 @@ export class AssignNewcomerPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad AssignNewcomerPage');
+    console.log('ionViewDidLoad AssignStatusPage');
   }
 
-  assignMember(member: any) {
-    this.matchDb.updateAssignment(this.navParams.data.summarykey, member.key,  member.name, this.authData.profile.getValue().uid);
+  assignStatus(status: string) {
+    this.matchDb.updateFollowupStatus(this.navParams.data.summarykey, status);
     this.navCtrl.pop();
   }
-
-  removeAssign() {
-    this.matchDb.updateAssignment(this.navParams.data.summarykey, "",  "", "");
-    this.navCtrl.pop();
-  }
-
 }

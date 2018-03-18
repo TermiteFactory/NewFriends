@@ -4,12 +4,40 @@
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
-<ion-header>
-
+<ion-header no-border>
   <ion-navbar>
     <ion-title>Editing {{local_data.name}}</ion-title>
   </ion-navbar>
-
+  <ion-toolbar>
+        <ion-grid>
+            <ion-row text-center no-padding no-margin>
+                <ion-col col-4 no-padding>
+                    <ion-buttons>
+                    <button ion-button clear icon-left (click)=deleteNewcomer()>
+                        <ion-icon name="trash"></ion-icon>
+                        Delete
+                      </button>
+                    </ion-buttons>
+                </ion-col>
+                <ion-col col-4 no-padding>
+                    <ion-buttons>
+                    <button ion-button clear icon-left (click)=undoEdit()>
+                        <ion-icon name="redo"></ion-icon>
+                        Undo
+                      </button>
+                    </ion-buttons>
+                </ion-col>
+                <ion-col col-4 no-padding>
+                    <ion-buttons>
+                    <button ion-button clear icon-left (click)=submitEdit()>
+                        <ion-icon name="send"></ion-icon>
+                        Submit
+                      </button>
+                    </ion-buttons>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+  </ion-toolbar>
 </ion-header>
 
 
@@ -23,6 +51,11 @@
     <ion-item>
         <ion-label color="primary" stacked>Visited On</ion-label>
         <ion-datetime  displayFormat="DDD D MMM YYYY" pickerFormat="D MMM YYYY" [(ngModel)]="local_data.dateVisited"></ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label color="primary" stacked>Description</ion-label>
+      <ion-textarea fz-elastic type="text" [(ngModel)]="local_data.description"></ion-textarea>
     </ion-item>
 
     <ion-item>
@@ -116,26 +149,5 @@
 </ion-content>
 
 <ion-footer no-border>
-  <ion-toolbar>
-    <ion-row text-center>
-      <ion-col>
-        <button outline ion-button (click)=deleteNewcomer()>
-          <ion-icon name="trash"></ion-icon>
-          Delete
-        </button>
-      </ion-col>
-      <ion-col>
-        <button outline ion-button (click)=undoEdit()>
-          <ion-icon name="undo"></ion-icon>
-          Undo Edit
-        </button>
-      </ion-col>
-      <ion-col>
-        <button outline ion-button (click)=submitEdit()>
-          <ion-icon name="send"></ion-icon>
-          Submit
-        </button>
-      </ion-col>
-    </ion-row>
-  </ion-toolbar>
+
 </ion-footer>

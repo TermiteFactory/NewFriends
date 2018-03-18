@@ -60,7 +60,8 @@ export class NewComersPage implements OnDestroy {
     if (this.searchTerm!='') {
       this.filteredSummaryList = [];
       this.originalSummaryList.forEach( item => {
-        if (item.name.toLowerCase().indexOf(this.searchTerm.toLowerCase()) != -1) {
+        if ((item.name != null && item.name.toLowerCase().indexOf(this.searchTerm.toLowerCase()) != -1) ||
+            (item.description != null && item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) != -1)) {
           this.filteredSummaryList.push(item);
         }
       } );

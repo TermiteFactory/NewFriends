@@ -9,7 +9,7 @@
   <ion-navbar>
     <ion-title>New Friends!</ion-title>
     <ion-buttons *ngIf="(matchDb.communityState | async) !=null && (matchDb.communityState | async).joinState=='Member'" end>
-      <button ion-button icon-left (click)="addNewcomer()"><ion-icon name="add"></ion-icon>Add</button>
+      <button ion-button icon-left (click)="addNewcomer()"><ion-icon name="person-add"></ion-icon>Add</button>
     </ion-buttons>
   </ion-navbar>
   <ion-toolbar>
@@ -27,7 +27,7 @@
   </ng-container>
   <ng-container *ngIf="(matchDb.communityState | async) !=null && (matchDb.communityState | async).joinState=='Member'">
     <ion-list>
-      <bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [person]=person></bydate-newcomers>
+      <bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [inputperson]=person></bydate-newcomers>
     </ion-list>
   </ng-container>
 </ion-content>
