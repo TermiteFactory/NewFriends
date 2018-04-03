@@ -19,6 +19,11 @@
 <ion-content padding>
   <ion-list>
     <ion-list-header color="light">Account</ion-list-header>
+    <ion-item>
+        <ion-label color="primary" stacked>Display Name</ion-label>
+        <ion-label>{{ (authData.authState | async)?.displayName }}</ion-label>
+        <button ion-button outline item-end (click)="changeNamePrompt()">Change</button> 
+    </ion-item>
     <ng-container *ngIf="((matchDb.communityState | async)?.communityName)!=null">
         <ion-item>
             <ion-label color="primary" stacked>Joined Community</ion-label>

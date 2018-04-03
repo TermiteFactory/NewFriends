@@ -22,7 +22,7 @@ export class GroupListPage {
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
     public actionSheetCtrl: ActionSheetController) {
     this.groupName = navParams.data.label_name;
-    this.newcomersSummary = matchDb.getSummaryList(ref=>ref.orderByChild(navParams.data.tag_name).equalTo(true));
+    this.newcomersSummary = matchDb.getSummaryList(ref=>ref.orderByChild('groups/' + navParams.data.tag_name).equalTo(true));
   }
 
   ionViewDidLoad() {

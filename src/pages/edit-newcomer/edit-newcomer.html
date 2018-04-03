@@ -55,7 +55,7 @@
 
     <ion-item>
       <ion-label color="primary" stacked>Description</ion-label>
-      <ion-textarea fz-elastic type="text" [(ngModel)]="local_data.description"></ion-textarea>
+      <ion-textarea fz-elastic rows="1" type="text" [(ngModel)]="local_data.description"></ion-textarea>
     </ion-item>
 
     <ion-item>
@@ -111,41 +111,12 @@
       </ion-select>
     </ion-item>
 
-      <ion-item>
-        <ion-label>Learn about Alpha</ion-label>
-        <ion-checkbox  [(ngModel)]="local_data.tag_alpha"></ion-checkbox>
-      </ion-item>
+    <ion-item *ngFor="let group of groupsconfig">
+      <ion-label>{{group.desc}}</ion-label>
+      <ion-checkbox [ngModel]="local_data.groups!=undefined && local_data.groups[group.key] == true" (ionChange)="onGroupChange($event, group.key)"></ion-checkbox> 
+    </ion-item>
 
-      <ion-item>
-        <ion-label>Learn about Connect Group or Cell Group</ion-label>
-        <ion-checkbox  [(ngModel)]="local_data.tag_connect"></ion-checkbox>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Learn about Church School or XS</ion-label>
-        <ion-checkbox  [(ngModel)]="local_data.tag_churchschool"></ion-checkbox>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Learn about YAM</ion-label>
-        <ion-checkbox  [(ngModel)]="local_data.tag_yam"></ion-checkbox>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Learn about CVL</ion-label>
-        <ion-checkbox  [(ngModel)]="local_data.tag_cvl"></ion-checkbox>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Speak to a Pastor</ion-label>
-        <ion-checkbox  [(ngModel)]="local_data.tag_pastor"></ion-checkbox>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Do not Contact Me</ion-label>
-        <ion-checkbox  [(ngModel)]="local_data.tag_nocontact"></ion-checkbox>
-      </ion-item>
-    </ion-list>
+  </ion-list>
 </ion-content>
 
 <ion-footer no-border>

@@ -1,11 +1,13 @@
 import { Component,  Input } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { NavController, NavParams, ActionSheetController } from 'ionic-angular';
-import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, FollowConfig } from '../../providers/matchstick-db/matchstick-db';
+import { Subscription } from 'rxjs/Subscription';
 import { SMS } from '@ionic-native/sms';
 import { CallNumber } from '@ionic-native/call-number';
 import { EmailComposer } from '@ionic-native/email-composer';
 import { AuthProvider } from '../../providers/auth/auth';
+import { OnDestroy } from '@angular/core';
 
 /**
  * Generated class for the ContactListComponent component.
@@ -17,13 +19,19 @@ import { AuthProvider } from '../../providers/auth/auth';
   selector: 'contact-list',
   templateUrl: 'contact-list.html'
 })
-export class ContactListComponent {
+export class ContactListComponent implements OnDestroy  {
 
   @Input() newcomersSummary: Observable<any[]>;
+  subConfig: Subscription;
+  config: FollowConfig[];
 
   constructor(public navCtrl: NavController, public navParams: NavParams,public actionSheetCtrl: ActionSheetController, 
     public matchDb: MatchstickDbProvider, private sms: SMS, public authData: AuthProvider, private callNumber: CallNumber,
     private emailComposer: EmailComposer) {
+
+      this.subConfig = matchDb.getFollowupConfig().subscribe( (c) => {
+        this.config = c;
+      });
   }
 
   showDetail(personDetailsKey: string, personKey: string) {
@@ -32,6 +40,37 @@ export class ContactListComponent {
       summarykey: personKey 
     });
   }
+
+  getStateColor(person: any) : string {
+    let state_color: string = ""
+    if (person.followup_name!="") {
+      state_color = "secondary";
+    } else {
+      state_color = "grey";
+    }
+    return state_color;
+  }
+
+  getStateIcon(person:any) : string {
+
+    let found = false;
+    let default_icon = ''
+    let state_icon: string = '';
+
+    this.config.forEach(element => {
+      if (person.followup_state == element.key) {
+        state_icon = element.icon;
+        found = true;
+      }
+      if (element.default==true) {
+        default_icon = element.icon;
+      }
+    });
+    if (!found) {
+      state_icon = default_icon;
+    }
+    return state_icon;
+}
 
   showActions(event: any, person: any) {
     event.stopPropagation();
@@ -101,6 +140,18 @@ export class ContactListComponent {
       ]
     });
     actionSheet.present();
+  }
+
+  assignStatus(event: any, person: any) {
+    this.navCtrl.push("AssignStatusPage", { summarykey: person.key,
+                                            name: person.name,
+                                            current: person.followup_name});
+  }
+
+  ngOnDestroy() {
+    if (this.subConfig!=null) {
+      this.subConfig.unsubscribe();
+    }
   }
 
 }

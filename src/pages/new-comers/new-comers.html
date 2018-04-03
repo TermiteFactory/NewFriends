@@ -27,7 +27,7 @@
   </ng-container>
   <ng-container *ngIf="(matchDb.communityState | async) !=null && (matchDb.communityState | async).joinState=='Member'">
     <ion-list>
-      <bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [inputperson]=person></bydate-newcomers>
+      <bydate-newcomers *ngFor="let person of filteredSummaryList | reverse | headers" [inputperson]="{personData: person, configData: config}"></bydate-newcomers>
     </ion-list>
   </ng-container>
 </ion-content>

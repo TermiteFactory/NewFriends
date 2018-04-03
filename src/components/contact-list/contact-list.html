@@ -8,20 +8,16 @@
 <ng-container *ngIf="(matchDb.communityState | async)!=null">
   <ion-list>
     <ion-item-sliding *ngFor="let person of newcomersSummary | async">
-      <ion-item  (click)="showDetail(person.details_key, person.key)" detail-push>{{person.name}} 
-        <ion-row>
-          <ion-col text-left>
-            <p>Email:{{person.email}}</p>
-          </ion-col>
-          <ion-col text-left>
-            <p>Tel:{{person.phone}}</p>
-          </ion-col>
-        </ion-row>
+      <ion-item  (click)="showDetail(person.details_key, person.key)" detail-push>
+        <h2>{{person.name}} </h2>
+        <p>Email: {{person.email}}</p>
+        <p>Tel: {{person.phone}}</p>
+        <ion-icon small [color]="getStateColor(person)" [name]="getStateIcon(person)" item-end></ion-icon>
       </ion-item>
       <ion-item-options side="right">
-        <button item-end ion-button color="secondary">
-          <ion-icon name="alarm"></ion-icon>
-          Remind
+        <button item-end ion-button  (click)="assignStatus($event, person)"color="grey">
+          <ion-icon name="git-branch"></ion-icon>
+          Status
         </button>
         <button item-end (click)="showActions($event, person)" ion-button color="primary">
           <ion-icon name="call"></ion-icon>

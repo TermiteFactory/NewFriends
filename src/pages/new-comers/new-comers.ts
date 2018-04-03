@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, LoadingController } from 'ionic-angular';
-import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, FollowConfig } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 
@@ -18,32 +18,31 @@ import { OnDestroy } from '@angular/core';
 export class NewComersPage implements OnDestroy {
   filteredSummaryList: any[];
   originalSummaryList: any[]; 
+  config: FollowConfig[];
   searchTerm: string = '';
   sub: Subscription;
+  subConfig: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
     public loadingCtrl: LoadingController) {
     
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
-
-     this.matchDb.validAuth.subscribe((state) => {
+      this.matchDb.validAuth.subscribe((state) => {
        if (state == false) {
-          if (this.sub!=null) {
-            this.sub.unsubscribe();
-          }
+          this.cleanUp();
        } else {
-        this.sub = matchDb.getSummaryList(ref=>ref.orderByChild("date")).subscribe( data => {
-          this.originalSummaryList = data;
-          this.setFilteredItems();
-          
-          if (loading!=null) {
-            loading.dismiss();
-            loading = null;
-          }
-        });
+
+        if (this.sub==null) {
+          this.sub = matchDb.getSummaryList(ref=>ref.orderByChild("date")).subscribe( data => {
+            this.originalSummaryList = data;
+            this.setFilteredItems();
+          });
+        }
+
+        if (this.subConfig==null) {
+          this.subConfig = matchDb.getFollowupConfig().subscribe( (c) => {
+            this.config = c;
+          });
+        }
        }
      })
   }
@@ -70,10 +69,19 @@ export class NewComersPage implements OnDestroy {
     }
   }
 
-  ngOnDestroy() {
+  cleanUp() {
     if (this.sub!=null) {
       this.sub.unsubscribe();
+      this.sub = null;
     }
+    if (this.subConfig!=null) {
+      this.subConfig.unsubscribe();
+      this.subConfig = null;
+    }
+  }
+
+  ngOnDestroy() {
+    this.cleanUp();
   }
 
 }

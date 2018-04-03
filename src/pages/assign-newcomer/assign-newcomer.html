@@ -8,9 +8,6 @@
 
   <ion-navbar>
     <ion-title>Select for {{navParams.data.name}}</ion-title>
-    <ion-buttons *ngIf="navParams.data.current!=''" end>
-        <button ion-button icon-left (click)="removeAssign()"><ion-icon name="trash"></ion-icon>Remove</button>
-    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
@@ -18,7 +15,9 @@
 
 <ion-content padding>
   <ion-list>
-      <ion-list-header icon-left color="light"><ion-icon name="body"></ion-icon>Assign for Followup</ion-list-header>
+      <ion-list-header icon-left color="light"><ion-icon name="body"></ion-icon>Assign for Followup
+        <button ion-button *ngIf="navParams.data.current!=''" item-end outline icon-left (click)="removeAssign()"><ion-icon name="trash"></ion-icon>Remove</button>
+      </ion-list-header>
       <ng-container *ngFor="let member of members | async">
           <ion-item *ngIf="member.auth=='Member'">
               {{member.name}} ({{member.email}})

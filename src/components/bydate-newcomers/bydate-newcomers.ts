@@ -21,23 +21,28 @@ export class BydateNewcomersComponent {
 
   @Input() 
   set inputperson(data: any) {
-    this.person = data;
+    this.person = data.personData;
+    let config = data.configData;
+
     if (this.person.followup_name!="") {
       this.state_color = "secondary";
     } else {
       this.state_color = "grey";
     }
-    
-    if (this.person.followup_state == "GetDetails") {
-      this.state_icon = "search";
-    } else if (this.person.followup_state == "GetIndication") {
-      this.state_icon = "time";
-    } else if (this.person.followup_state == "LinkUp") {
-      this.state_icon = "checkbox";
-    } else if (this.person.followup_state == "NoFollowup") {
-      this.state_icon = "hand";
-    } else {
-      this.state_icon = "search";
+
+    let found = false;
+    let default_icon = ''
+    config.forEach(element => {
+      if (this.person.followup_state == element.key) {
+        this.state_icon = element.icon;
+        found = true;
+      }
+      if (element.default==true) {
+        default_icon = element.icon;
+      }
+    });
+    if (!found) {
+      this.state_icon = default_icon;
     }
   }
 

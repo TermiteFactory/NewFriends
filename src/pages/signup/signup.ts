@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { 
   IonicPage, 
   NavController, 
@@ -10,7 +10,6 @@ import { AuthProvider } from '../../providers/auth/auth';
 import { TabsPage } from '../tabs/tabs';
 import { EmailValidator } from '../../validators/email';
 import { AngularFireDatabase } from 'angularfire2/database';
-
 
 /**
  * Generated class for the SignupPage page.
@@ -24,7 +23,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
   selector: 'page-signup',
   templateUrl: 'signup.html',
 })
-export class SignupPage {
+export class SignupPage implements OnDestroy {
   public signupForm: FormGroup;
   public loading: Loading;
 
@@ -78,6 +77,12 @@ export class SignupPage {
         dismissOnPageChange: true,
       });
       this.loading.present();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.loading!=null) {
+      this.loading.dismiss();
     }
   }
 }

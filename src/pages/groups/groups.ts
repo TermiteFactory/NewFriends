@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, LoadingController } from 'ionic-angular';
-import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, GroupConfig, SummaryDataKey } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 
@@ -17,16 +17,11 @@ import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 })
 export class GroupsPage implements OnDestroy{
 
-  groupsListing: {label: string, tag: string, count: number}[] = 
-            [ 
-              { label: "Learn about Alpha", tag: "tag_alpha", count: 0 },
-              { label: "Learn about Connect/Cell Group", tag: "tag_connect", count: 0 },
-              { label: "Learn about Church School/ XS", tag: "tag_churchschool", count: 0 },
-              { label: "Learn about YAM", tag: "tag_yam", count: 0 },
-              { label: "Learn about CVL", tag: "tag_cvl", count: 0 },
-              { label: "Speak to Pastor", tag: "tag_pastor", count: 0 },
-              { label: "Do not Contact", tag: "tag_nocontact", count: 0 }
-            ];
+  groupsListing: {label: string, key: string, count: number}[] = []
+  groupsconfig: GroupConfig[] = [];
+  summary: SummaryDataKey[] = [];
+
+  subGroups: Subscription;
   myNavCtrl: NavController;
   sub: Subscription;
 
@@ -38,6 +33,30 @@ export class GroupsPage implements OnDestroy{
     });
     loading.present();
 
+    let summaryOk = false;
+    let groupsOk = false;
+
+    let checkAndDismiss = () => {
+      if (summaryOk==true && groupsOk==true) {
+        this.generateGroupsListing();
+        if (loading!=null) {
+          loading.dismiss();
+          loading = null;
+        }
+      }
+    };
+
+    this.subGroups = matchDb.getGroupsConfig().subscribe( (config) => {
+      if (config != null) {
+        this.groupsListing = [];
+        config.forEach( config => {
+          this.groupsListing.push({label: config.desc, key: config.key, count: 0})
+        });
+        groupsOk = true;
+        checkAndDismiss();
+      }
+    });
+
     this.matchDb.validAuth.subscribe((state) => {
       if (state == false) {
         if (this.sub!=null) {
@@ -45,20 +64,22 @@ export class GroupsPage implements OnDestroy{
         }
       } else {
         this.sub = matchDb.getSummaryList().subscribe( people => {
-          this.groupsListing.forEach(listing => listing.count = 0);
-          people.forEach( person => {
-             this.groupsListing.forEach(listing => {
-                if (person[listing.tag] == true) { 
-                  listing.count = listing.count + 1;
-                };
-             });
-          })
-          if (loading!=null) {
-            loading.dismiss();
-            loading = null
-          }
+          this.summary = people;
+          summaryOk = true;
+          checkAndDismiss();
         });
       }
+    })
+  }
+
+  generateGroupsListing() {
+    this.groupsListing.forEach(listing => listing.count = 0);
+    this.summary.forEach( person => {
+        this.groupsListing.forEach(listing => {
+          if (person.groups!=undefined && person.groups[listing.key] == true) { 
+            listing.count = listing.count + 1;
+          };
+        });
     })
   }
 
@@ -73,6 +94,9 @@ export class GroupsPage implements OnDestroy{
   ngOnDestroy() {
     if (this.sub!=null) {
       this.sub.unsubscribe();
+    }
+    if (this.subGroups!=null) {
+      this.subGroups.unsubscribe();
     }
   }
 

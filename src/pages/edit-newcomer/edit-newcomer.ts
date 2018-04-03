@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
-import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, DetailedData, GroupConfig } from '../../providers/matchstick-db/matchstick-db';
 /**
  * Generated class for the EditNewcomerPage page.
  *
@@ -18,7 +18,11 @@ import { MatchstickDbProvider, DetailedData } from '../../providers/matchstick-d
 export class EditNewcomerPage implements OnDestroy{
 
   db_data: DetailedData = new DetailedData;
+  db_groups: any = {};
   local_data: DetailedData = new DetailedData;
+  groupsconfig: GroupConfig[] = [];
+
+  subGroups: Subscription;
   sub: Subscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public matchDb: MatchstickDbProvider,
@@ -29,12 +33,29 @@ export class EditNewcomerPage implements OnDestroy{
     });
     loading.present();
 
+    let detailedOk = false;
+    let groupsOk = false;
+
+    let checkAndDismiss = () => {
+      if (loading!=null && detailedOk==true && groupsOk==true) {
+        loading.dismiss();
+        loading = null;
+      }
+    };
+
     this.sub = this.matchDb.getDetailed(navParams.data.newcomerkey).subscribe( mydata => {
       this.db_data = mydata;
       Object.assign(this.local_data, mydata); 
-      if (loading!=null) {
-        loading.dismiss();
-        loading = null
+      Object.assign(this.db_groups, mydata.groups); 
+      detailedOk = true;
+      checkAndDismiss();
+    });
+
+    this.subGroups = matchDb.getGroupsConfig().subscribe( (g) => {
+      if (g != null) {
+        this.groupsconfig = g;
+        groupsOk = true;
+        checkAndDismiss();
       }
     });
   }
@@ -73,10 +94,21 @@ export class EditNewcomerPage implements OnDestroy{
 
   undoEdit() {
     Object.assign(this.local_data, this.db_data);
+    Object.assign(this.local_data.groups, this.db_groups); 
+  }
+
+  onGroupChange(event: any, groupkey: string) {
+    if (event.checked == true) {
+      this.local_data.groups[groupkey] = true;
+    }
+    else {
+      delete this.local_data.groups[groupkey];
+    }
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+    this.subGroups.unsubscribe();
   }
 
 }

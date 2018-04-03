@@ -243,6 +243,26 @@ export class MatchstickDbProvider implements OnDestroy {
     return this.afd.object('/communities/' + communityId + '/data/persons/' + detailedKey + '/notes/' + noteId);
   }
 
+  private getFollowupConfigRef(queryFn?: QueryFn): AngularFireList<FollowConfig> {
+    return this.afd.list('/configuration/followup', queryFn);
+  }
+
+  private getGroupsConfigRef(queryFn?: QueryFn): AngularFireList<FollowConfig> {
+    return this.afd.list('/configuration/groups', queryFn);
+  }
+
+  getFollowupConfig(): Observable<FollowConfig[]> {
+    return this.getFollowupConfigRef(ref=>ref.orderByChild("id")).snapshotChanges().map(changes => {
+      return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+    });
+  }
+
+  getGroupsConfig(): Observable<GroupConfig[]> {
+    return this.getGroupsConfigRef(ref=>ref.orderByChild("id")).snapshotChanges().map(changes => {
+      return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+    });
+  }
+
   getEmailSubject(): Observable<string> {
     return this.afd.object<string>('/communities/' + this.communityState.getValue().communityId + '/messages/emailsubject').valueChanges();
   }
@@ -302,7 +322,11 @@ export class MatchstickDbProvider implements OnDestroy {
   updateAssignment(summaryKey: string, followup_id: string, followup_name: string, assign_id: string): Promise<void> {
     return new Promise((resolve, reject) => {
       let joinState = this.communityState.getValue();
-      this.getSummaryRef(summaryKey, joinState.communityId).update({followup_id: followup_id, followup_name: followup_name, assign_id: assign_id}).then( () => {
+      let date_today = '';
+      if (followup_id != '') {
+        date_today = this.getDateToday();
+      }
+      this.getSummaryRef(summaryKey, joinState.communityId).update({followup_id: followup_id, followup_name: followup_name, assign_id: assign_id, assign_date: date_today}).then( () => {
         resolve();
       }, () => reject);
     });
@@ -366,6 +390,21 @@ export class MatchstickDbProvider implements OnDestroy {
     this.getPersonNotesRef(detailedKey, joinState.communityId).push(note);
   }
 
+  getDateToday() {
+    function pad(datenum: Number) {
+      let datestring : String;
+      datestring = datenum.toString();
+      if (datestring.length == 2) {
+        return datestring;
+      }
+      else {
+        return '0' + datestring;
+      }
+    }
+    let today = new Date;
+    return today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+  }
+
   addData(detailData: DetailedData): Promise<void> {
     return new Promise( (resolve, reject) => {
       let joinState = this.communityState.getValue();
@@ -397,16 +436,10 @@ export class MatchstickDbProvider implements OnDestroy {
   copyToSummary (from: DetailedData, to: SummaryData)  {
     to.date = from.dateVisited;
     to.name = from.name;
-    to.tag_alpha = from.tag_alpha;
-    to.tag_connect = from.tag_connect;
-    to.tag_churchschool = from.tag_churchschool;
-    to.tag_yam = from.tag_yam;
-    to.tag_cvl = from.tag_cvl;
-    to.tag_pastor = from.tag_pastor;
-    to.tag_nocontact = from.tag_nocontact;
     to.email = from.email;
     to.phone = from.phone;
     to.description = from.description;
+    to.groups = from.groups;
   }
 
   getPermissionsList(): Observable<any[]> {
@@ -567,6 +600,20 @@ export class MatchstickDbProvider implements OnDestroy {
   
 }
 
+export class FollowConfig {
+  default: boolean = false;
+  desc: string = "";
+  icon: string = "";
+  id: number = 0;
+  key: string = "";
+}
+
+export class GroupConfig {
+  desc: string = "";
+  id: number = 0;
+  key: string = "";
+}
+
 export class Permission {
   auth: string = "Pending";
   name: string = "";
@@ -591,16 +638,10 @@ export class Community {
 export class SummaryData {
   date: string = "";
   name: string = "";
-  tag_alpha: boolean = false;
-  tag_connect: boolean = false;
-  tag_churchschool: boolean = false;
-  tag_yam: boolean = false;
-  tag_cvl: boolean = false;
-  tag_pastor: boolean = false;
-  tag_nocontact: boolean = false;
   email: string = "";
   phone: string = "";
   description: string ="";
+  groups: any = {};
 
   constructor() {
   }
@@ -616,13 +657,15 @@ export class Note {
   }
 }
 
+// This class contains all the fields NOT duplicated
 export class SummaryDataKey extends SummaryData {
-  details_key: string = "";
-  followup_name: string = "";
-  followup_id: string = "";  
-  assign_id: string ="";
-  add_id: string ="";
-  followup_state: string ="";
+  details_key: string = ""; // The link to the details record
+  followup_name: string = ""; // The name of the person assigned to followup
+  followup_id: string = "";  // The if person assigned to follow up on the the new comer
+  assign_date: string = ""; // Date that the assignment occurred
+  assign_id: string ="";  // The id of the person who assigned the person
+  add_id: string =""; // The id of the person who added the person
+  followup_state: string =""; // The state of the followup 
 
   constructor() {
     super();
@@ -647,14 +690,8 @@ export class DetailedData {
   religion: string = "";
   purpose: string = "";
   visitedBefore: string = "";
-  tag_alpha: boolean = false;
-  tag_connect: boolean = false;
-  tag_churchschool: boolean = false;
-  tag_yam: boolean = false;
-  tag_cvl: boolean = false;
-  tag_pastor: boolean = false;
-  tag_nocontact: boolean = false;
   description: string ="";
+  groups: any = {};
 
   constructor() {
   }

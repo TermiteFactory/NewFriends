@@ -43,6 +43,38 @@ export class SettingsPage implements OnDestroy {
     this.authData.logoutUser();
   }
 
+  changeNamePrompt() {
+    let myname = this.authData.authState.getValue().displayName;
+    let prompt = this.alertCtrl.create({
+      title: 'Display Name',
+      inputs: [
+        {
+          name: 'name',
+          value: myname
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Change',
+          handler: data => {
+            this.changeName(data.name);
+          }
+        }
+      ]
+    });
+    prompt.present();
+  }
+
+  changeName(name: string) {
+    this.authData.addProfileData(name);
+  }
+
   communityPrompt() {
     let prompt = this.alertCtrl.create({
       title: 'Add Community',
