@@ -1,0 +1,33 @@
+<!--
+  Generated template for the NotificationSettingsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Notification Settings</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content padding>
+    <ion-list>
+        <ng-container *ngFor="let commnotify of notifications">
+            <ion-list-header color="light">{{commnotify.name}}</ion-list-header>
+            <ion-item>
+                <ion-label>Newcomer Added</ion-label>
+                <ion-toggle (ionChange)="matchDb.updateNewcomerNotify(commnotify.key, !commnotify.newcomer_notify)" [ngModel]="commnotify.newcomer_notify"></ion-toggle>
+            </ion-item>
+            <ion-item>
+                <ion-label>Assigned Someone to You</ion-label>
+                <ion-toggle (ionChange)="matchDb.updateAssignNotify(commnotify.key, !commnotify.assignment_notify)" [ngModel]="commnotify.assignment_notify"></ion-toggle>
+            </ion-item>
+            <ion-item *ngFor="let groupkey of getPropertyNames(commnotify.group_notify)">
+                <ion-label>{{retrieveGroupDesc(groupkey)}}</ion-label>
+                <ion-toggle (ionChange)="matchDb.updateGroupNotify(commnotify.key, groupkey, !commnotify.group_notify[groupkey])" [ngModel]="commnotify.group_notify[groupkey]"></ion-toggle>
+            </ion-item>
+        </ng-container>
+    </ion-list>
+</ion-content>

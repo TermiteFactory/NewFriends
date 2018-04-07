@@ -21,15 +21,10 @@ import { auth } from 'firebase/app';
 @Injectable()
 export class MatchstickDbProvider implements OnDestroy {
   
-  communityState: BehaviorSubject<JoinData | null>;
+  communityState: BehaviorSubject<JoinData | null>; // Give details of the community state
   newcomerNotify: BehaviorSubject<boolean>;
   newcomerAssigned: BehaviorSubject<boolean>;
   validAuth: BehaviorSubject<boolean>;
-
-  private registeredState: JoinData;
-  private registeredProfile: ProfileUid;
-  private assignRegistered: boolean;
-  private newRegistered: boolean;
 
   private profileSub1: Subscription;
   private profileSub2: Subscription;
@@ -49,11 +44,6 @@ export class MatchstickDbProvider implements OnDestroy {
     this.nameSub = null;
     this.communityState = new BehaviorSubject(null);
 
-    this.registeredState = null;
-    this.registeredProfile = null;
-    this.assignRegistered = false;
-    this.newRegistered = false;
-
     this.validAuth = new BehaviorSubject(false);
     authData.authState.subscribe( (state) => {
       if (state!=null) {
@@ -62,6 +52,8 @@ export class MatchstickDbProvider implements OnDestroy {
     });
     
     this.profileSub1 = this.authData.profile.subscribe( (profileUid) => {
+      // Update the notifications table when profile changes
+      this.checkUpdateNotifications();
 
       if (this.stateSub != null) {
         this.stateSub.unsubscribe();
@@ -92,54 +84,18 @@ export class MatchstickDbProvider implements OnDestroy {
       }
     });
 
-    // Init the values
-    this.newcomerNotify = new BehaviorSubject(true);
-    this.newcomerAssigned = new BehaviorSubject(true);
-
-    // Get the latest values from storage and set the behavior subject
-    // No need to set DB as this will be done on community detection
-    storage.get('newComerNotify').then((val) => {
-      if (val == null) {    
-        this.storage.set('newComerNotify', true); 
-      } else {
-        this.newcomerNotify.next(val);
-      }
-    });
-    storage.get('newComerAssigned').then((val) => {
-      if (val == null) {
-        this.storage.set('newComerAssigned', true);
-      } else {
-        this.newcomerAssigned.next(val);
-      }
-    });
-
     // Handle the case where the token can change after an OS upgrade
     // Just set the DB on change as there is no change in behavior subject
     this.tokenSub = this.fcm.onTokenRefresh().subscribe( () => {
-      this.getToken(); // Refresh the token again
-      this.updateNotifyNewDB(this.newcomerNotify.getValue());
-      this.updateNotifyAssignedDB(this.newcomerAssigned.getValue());
+      this.updateToken(); // Refresh the token again
     }, error => {});
-
-    // Get the community change
-    this.communityState.subscribe( (joinstate) => {
-      if (joinstate != null && joinstate.joinState == "Member") {
-        // Register tokens when joining a community
-        this.updateNotifyNewDB(this.newcomerNotify.getValue());
-        this.updateNotifyAssignedDB(this.newcomerAssigned.getValue());
-
-      } else {
-        // Remove previous tokens
-        this.removeTokens();
-      }
-    });
 
     // Only when platform is ready
     plt.ready().then( () => {
       console.log('Platform is ready. Starting to subscribe for notifications');
 
       // Obtain the token upon startup
-      this.getToken();
+      this.updateToken();
 
       // Register for notification callback
       this.notifySub = fcm.onNotification().subscribe( data => {
@@ -161,33 +117,71 @@ export class MatchstickDbProvider implements OnDestroy {
     });
   }
 
-  getToken() {
+  updateToken() {
     // Get the current token
     this.fcm.getToken().then( token => {
       this.token = token;
+      this.writeToken(token);
     }).catch( () => {
       this.token = '1234567';
+      this.writeToken('1234567');
     });
+  }
+
+  writeToken(token: string) {
+    let profileuid = this.authData.profile.getValue();
+    if (profileuid!=null) {
+      this.afd.object('/notifications/' + profileuid.uid + '/' + '/notifytokens/'+ token).set(true);
+    }
+    else {
+      let sub = this.authData.profile.subscribe( profileuid => {
+        if (profileuid!=null) {
+          this.afd.object('/notifications/' + profileuid.uid + '/' + '/notifytokens/'+ token).set(true);
+          sub.unsubscribe();
+        }
+      });
+    }
+  }
+
+  checkUpdateNotifications() {
+    let profileuid = this.authData.profile.getValue();
+    if (profileuid!=null) {
+      this.getGroupsConfig().subscribe(grps => {
+        let memberSub = this.getMembershipList().subscribe( memberlist => {
+          let commNotSub = this.afd.object('/notifications/' + profileuid.uid + '/configuration/').valueChanges().subscribe(conf => {
+            // For each community that you are member of, ensure that you have something there!   
+            memberlist.forEach(membership => {
+              if (membership.membership=='Member' && (conf==undefined || conf == null || conf[membership.community_id] == undefined)) {
+                let conf = new NotifyCommunityConf();
+                conf.name = membership.community_name;
+                this.afd.object<NotifyCommunityConf>('/notifications/' + profileuid.uid + '/configuration/' + membership.community_id).set(conf);
+                grps.forEach(g => {
+                  this.afd.object('/notifications/' + profileuid.uid + '/configuration/' + membership.community_id + '/group_notify/' + g.key).set(false);
+                });
+              }
+            });
+            // For reach community that you are not a member of, please remove!
+            let properties = Object.getOwnPropertyNames(conf);
+            properties.forEach( prop => {
+              let found = false;
+              memberlist.forEach(mem => {
+                if (mem.community_id==prop && mem.membership=='Member') {
+                  found = true;
+                }
+              })
+              if (found==false) {
+                this.afd.object<NotifyCommunityConf>('/notifications/' + profileuid.uid + '/configuration/' + prop).remove();
+              }
+            }); 
+            commNotSub.unsubscribe();
+          });
+        });
+      });
+    }
   }
 
   pendingSignout() {
     this.validAuth.next(false);
-    this.removeTokens();
-  }
-
-  removeTokens() {
-    if (this.registeredState!=null) {
-      if (this.newRegistered) {
-        this.afd.object('/communities/' + this.registeredState.communityId + '/notifytokens/'+ this.token).remove();
-        this.newRegistered = false;
-      }
-      if (this.registeredProfile!=null) {
-        if (this.assignRegistered) {
-          this.afd.object('/communitiesinfo/' + this.registeredState.communityId + '/permissions/'+ this.registeredProfile.uid + '/notifytokens/' + this.token).remove();
-          this.assignRegistered = false;
-        }
-      }
-    }
   }
 
   // Listens to the change in profiles and will add the uid to the community when necessary 
@@ -197,14 +191,16 @@ export class MatchstickDbProvider implements OnDestroy {
       if (profileUid!=null) {
         if (profileUid.community != "") {
           let permissionSub: Subscription = this.afd.object('/communitiesinfo/' + profileUid.community + '/permissions/').valueChanges().subscribe( (state) => {
-            if (state == null || state == 0 || !(profileUid.uid in state)) {
+            if (state!=null && (state == 0 || !(profileUid.uid in state))) {
               let permission = new Permission;
               let userdata = this.authData.authState.getValue();
               permission.email = userdata.email;
               permission.name = userdata.displayName;
               this.afd.object('/communitiesinfo/' + profileUid.community + '/permissions/' + profileUid.uid).set(permission);
+            } 
+            if (state!=null) {
+              permissionSub.unsubscribe();      
             }
-            permissionSub.unsubscribe();      
           }); 
         }
       }
@@ -275,49 +271,6 @@ export class MatchstickDbProvider implements OnDestroy {
     return this.afd.object<string>('/communities/' + this.communityState.getValue().communityId + '/messages/sms').valueChanges();
   }
 
-  updateNotifyNew(notify: boolean) {
-    this.storage.set('newComerNotify', notify);
-    this.newcomerNotify.next(notify);
-    this.updateNotifyNewDB(notify);
-  }
-
-  updateNotifyNewDB(notify: boolean) {
-    let joinState = this.communityState.getValue();
-    if (joinState != null && joinState.joinState == "Member") {
-      if (notify==true) {
-        this.registeredState = joinState;
-        this.newRegistered = true;
-        this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).set(true);
-      }
-      else {
-        this.afd.object('/communities/' + joinState.communityId + '/notifytokens/'+ this.token).remove();
-        this.newRegistered = false;
-      }
-    }
-  }
-
-  updateNotifyAssigned(notify: boolean) {
-    this.storage.set('newComerAssigned', notify);
-    this.newcomerAssigned.next(notify);
-    this.updateNotifyAssignedDB(notify);
-  }
-
-  updateNotifyAssignedDB(notify: boolean) {
-    let joinState = this.communityState.getValue();
-    if (joinState != null && joinState.joinState == "Member") {
-      let profileuid = this.authData.profile.getValue();
-      if (notify==true) {
-        this.registeredState = joinState;
-        this.registeredProfile = profileuid;
-        this.assignRegistered = true;
-        this.afd.object('/communitiesinfo/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).set(true);
-      }
-      else {
-        this.afd.object('/communitiesinfo/' + joinState.communityId + '/permissions/'+ profileuid.uid + '/notifytokens/' + this.token).remove();
-        this.assignRegistered = false;
-      }
-    }
-  }
 
   updateAssignment(summaryKey: string, followup_id: string, followup_name: string, assign_id: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -442,6 +395,31 @@ export class MatchstickDbProvider implements OnDestroy {
     to.groups = from.groups;
   }
 
+  getMembershipList(): Observable<Membership[]> {
+    return Observable.create( (observer) => {
+      let communitySub = this.afd.list('/communitiesinfo/').snapshotChanges().map(changes => {
+        return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+      }).subscribe( (list) => {
+        let profile = this.authData.profile.getValue();
+        let memberlist: Membership[] = [];
+        list.forEach( element => {
+          if (element.permissions[profile.uid]!=undefined) {
+            let member = new Membership;
+            member.community_id = element.key;
+            member.community_name = element.name;
+            member.membership = element.permissions[profile.uid].auth;
+            memberlist.push(member);
+          } 
+        });
+        observer.next(memberlist);
+      });
+      // Return Unsubscribe function
+      return () => {
+        communitySub.unsubscribe();
+      }
+    });
+  }
+
   getPermissionsList(): Observable<any[]> {
     return Observable.create( (observer) => {
       let permSub: Subscription = null;
@@ -494,6 +472,38 @@ export class MatchstickDbProvider implements OnDestroy {
         commSub.unsubscribe();
       }
     });
+  }
+
+  updateNewcomerNotify(communityId: string, value: boolean) {
+    let profileuid = this.authData.profile.getValue();
+    this.afd.object('/notifications/' + profileuid.uid + '/configuration/' + communityId + '/newcomer_notify').set(value);
+  }
+
+  updateAssignNotify(communityId: string, value: boolean) {
+    let profileuid = this.authData.profile.getValue();
+    this.afd.object('/notifications/' + profileuid.uid + '/configuration/' + communityId + '/assignment_notify').set(value);
+  }
+
+  updateGroupNotify(communityId: string, groupKey: string, value: boolean) {
+    let profileuid = this.authData.profile.getValue();
+    this.afd.object('/notifications/' + profileuid.uid + '/configuration/' + communityId + '/group_notify/' + groupKey).set(value);
+  }
+
+  getNotificationSettings() : Observable<NotifyCommunityConfKey[]> {
+    return Observable.create( (observer) => {
+      let profileuid = this.authData.profile.getValue();
+      let notifySub = this.afd.list<NotifyCommunityConf>('/notifications/' + profileuid.uid + '/configuration/').snapshotChanges().map(changes => {
+        return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+      }).subscribe( (list) => {
+        observer.next(list);
+      });
+      // Return Unsubscribe function
+      return () => {
+        if (notifySub!=null) {
+          notifySub.unsubscribe();
+        }
+      }
+    });    
   }
 
   getDetailed(detailedKey: string) : Observable<any> {
@@ -561,10 +571,7 @@ export class MatchstickDbProvider implements OnDestroy {
   }
 
   setCommmunity(communityId: string) {
-    let user = this.authData.authState.getValue();
-    
-    // user should not be null at this point!
-    this.authData.updateCommunity(communityId, user.uid);
+    this.authData.updateCommunity(communityId);
   }
 
   modifyNote(detailedKey: string, text: string, noteId: string): Promise<void> {
@@ -597,7 +604,23 @@ export class MatchstickDbProvider implements OnDestroy {
       this.notifySub.unsubscribe();
     }
   }
-  
+}
+
+export class NotifyCommunityConf {
+  newcomer_notify: boolean = true;
+  assignment_notify: boolean = true;
+  group_notify: any = {}; // group_id: true/false
+  name: string = "";
+}
+
+export class NotifyCommunityConfKey extends NotifyCommunityConf{
+  key: string = "";
+}
+
+export class Membership {
+  community_id: string = "";
+  community_name: string = "";
+  membership: string = "";
 }
 
 export class FollowConfig {

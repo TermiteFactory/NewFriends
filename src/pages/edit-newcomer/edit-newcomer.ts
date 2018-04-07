@@ -46,7 +46,9 @@ export class EditNewcomerPage implements OnDestroy{
     this.sub = this.matchDb.getDetailed(navParams.data.newcomerkey).subscribe( mydata => {
       this.db_data = mydata;
       Object.assign(this.local_data, mydata); 
-      Object.assign(this.db_groups, mydata.groups); 
+      if (mydata!=null) {
+        Object.assign(this.db_groups, mydata.groups); 
+      }
       detailedOk = true;
       checkAndDismiss();
     });

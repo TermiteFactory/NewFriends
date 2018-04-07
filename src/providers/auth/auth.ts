@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Storage } from '@ionic/storage';
 
 /*
   Generated class for the AuthProvider provider.
@@ -18,24 +19,26 @@ export class AuthProvider implements OnDestroy {
 
   authState: BehaviorSubject<firebase.User | null>;
   profile: BehaviorSubject<ProfileUid | null>; 
+  communityId: BehaviorSubject<string | null>;
 
   private profileObservable: Observable<ProfileUid | null>; 
 
-  constructor(public afAuth: AngularFireAuth, public afd:AngularFireDatabase) {
+  constructor(public afAuth: AngularFireAuth, public afd:AngularFireDatabase, public storage: Storage) {
     this.authState = new BehaviorSubject(null);
+    this.communityId = new BehaviorSubject(null);
     this.afAuth.authState.subscribe(this.authState);
 
     this.profileObservable = Observable.create((observer) => {
-      let profileSub: Subscription;
       let superadminSub: Subscription;
       let authSub: Subscription;
+      let commSub: Subscription;
 
       authSub = this.authState.subscribe((auth) => {
         if (auth!=null) {
           let profileUid: ProfileUid = new ProfileUid;
-          
-          profileSub = this.afd.object<Profile>('/profiles/' + auth.uid).valueChanges().subscribe( (profile) => {
-            profileUid.assign(profile);
+
+          commSub = this.communityId.subscribe( id => {
+            profileUid.community = id;
             profileUid.uid = auth.uid;
             observer.next(profileUid);
           });
@@ -52,11 +55,11 @@ export class AuthProvider implements OnDestroy {
           });
 
         } else {
-          if (profileSub!=null) {
-            profileSub.unsubscribe();
-          }
           if (superadminSub!=null) {
             superadminSub.unsubscribe();
+          }
+          if (commSub!=null) {
+            commSub.unsubscribe();
           }
           observer.next(null);
         }
@@ -68,6 +71,10 @@ export class AuthProvider implements OnDestroy {
     });
     this.profile = new BehaviorSubject(null);
     this.profileObservable.subscribe(this.profile);
+
+    this.storage.get('communityId').then( id => {
+       this.communityId.next(id);     
+    });
   }
 
   loginUser(newEmail: string, newPassword: string): Promise<any> {
@@ -92,8 +99,7 @@ export class AuthProvider implements OnDestroy {
     return new Promise( (response, reject) => {
       this.afAuth.auth.createUserWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
         this.addProfileData(username);
-        this.afd.object('/profiles/' + userdata.uid).set(new Profile);
-
+        this.storage.set('communityId', null);
         response(userdata);   
       }, (error) => reject(error));
     });
@@ -115,30 +121,17 @@ export class AuthProvider implements OnDestroy {
     }
   }
 
-  updateCommunity(communityId: string, uid: string) {
-    this.afd.object<Profile>('/profiles/' + uid).update({community: communityId});
+  updateCommunity(communityId: string) {
+    this.storage.set('communityId', communityId);
+    this.communityId.next(communityId);
   }
 
   ngOnDestroy() {
   }
 }
 
-export class Profile {
-  community: string = "";
-
-  constructor() {
-  }
-}
-
-export class ProfileUid extends Profile {
+export class ProfileUid {
   uid: string = "";
   superadmin: boolean = false;
-
-  assign(superClass: Profile) {
-    this.community = superClass.community;
-  }
-
-  constructor() {
-    super();
-  }
+  community: string = "";
 }

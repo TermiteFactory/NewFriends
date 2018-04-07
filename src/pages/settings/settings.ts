@@ -3,7 +3,7 @@ import { NavController, NavParams, LoadingController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { App } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
-import { MatchstickDbProvider } from '../../providers/matchstick-db/matchstick-db';
+import { MatchstickDbProvider, Membership } from '../../providers/matchstick-db/matchstick-db';
 import { Subscription } from 'rxjs/Subscription';
 import { OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
@@ -25,12 +25,15 @@ export class SettingsPage implements OnDestroy {
   newComerNotify: boolean;
   newComerAssigned: boolean;
   tokenSub: Subscription;
+
+  membership: Observable<Membership[]>;
   
   constructor(public navCtrl: NavController, public navParams: NavParams,public authData: AuthProvider, 
     public app: App, public alertCtrl: AlertController, public matchDb: MatchstickDbProvider,
     public loadingCtrl: LoadingController) {
     
       this.permissions = matchDb.getPermissionsList();
+      this.membership = matchDb.getMembershipList();
   }
 
   ionViewDidLoad() {
@@ -155,6 +158,10 @@ export class SettingsPage implements OnDestroy {
 
       communityListSub.unsubscribe();
     });
+  }
+
+  goToNotificationSettings() {
+    this.navCtrl.push("NotificationSettingsPage");
   }
 
   ngOnDestroy() {

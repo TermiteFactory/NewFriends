@@ -24,37 +24,28 @@
         <ion-label>{{ (authData.authState | async)?.displayName }}</ion-label>
         <button ion-button outline item-end (click)="changeNamePrompt()">Change</button> 
     </ion-item>
-    <ng-container *ngIf="((matchDb.communityState | async)?.communityName)!=null">
-        <ion-item>
-            <ion-label color="primary" stacked>Joined Community</ion-label>
-            <ion-label>{{(matchDb.communityState | async)?.communityName}}</ion-label>
-            <button ion-button outline item-end (click)="communityListPrompt()">Switch</button> 
-        </ion-item>
-        <ion-item>
-            <ion-label color="primary" stacked>Membership Status</ion-label>
-            <ion-label>{{(matchDb.communityState | async)?.joinState}}</ion-label>
-        </ion-item>
-    </ng-container>
-    <ng-container *ngIf="((matchDb.communityState | async)?.communityName)==null">
-        <ion-item>
-            <ion-label color="primary" stacked>Joined Community</ion-label>
-            <ion-label>&nbsp;</ion-label>
-            <button ion-button outline item-end (click)="communityListPrompt()">Join</button> 
-        </ion-item>
-        <ion-item>
-            <ion-label color="primary" stacked>Membership Status</ion-label>
-            <ion-label>&nbsp;</ion-label>
-        </ion-item>
-    </ng-container>
+
+    <ion-list-header color="light">Membership
+        <button ion-button outline item-end (click)="communityListPrompt()">Join New</button> 
+    </ion-list-header>
+
+    <ion-item *ngFor="let member of membership | async">
+        <ion-label color="primary" *ngIf="(matchDb.communityState | async)?.communityName!=member.community_name">
+                {{member.community_name}}</ion-label>
+        <ion-label color="secondary" *ngIf="(matchDb.communityState | async)?.communityName==member.community_name">
+                {{member.community_name}}</ion-label>
+        <ion-label text-center>{{member.membership}}</ion-label>
+        <button *ngIf="member.membership=='Member' && (matchDb.communityState | async)?.communityName!=member.community_name" 
+                ion-button outline item-end (click)="matchDb.setCommmunity(member.community_id)">Switch</button> 
+        <button *ngIf="member.membership!='Member' || (matchDb.communityState | async)?.communityName==member.community_name" 
+                ion-button outline item-end disabled color="grey">Switch</button> 
+    </ion-item>
+    
     <ion-list-header color="light">Notifications</ion-list-header>
-    <ion-item>
-        <ion-label>Newcomer Added</ion-label>
-        <ion-toggle item-end  (ionChange)="matchDb.updateNotifyNew(!matchDb.newcomerNotify.getValue())" [ngModel]="matchDb.newcomerNotify | async"></ion-toggle>
+    <ion-item detail-push (click)="goToNotificationSettings()" >
+        <ion-label>Notification Settings</ion-label>
     </ion-item>
-    <ion-item>
-        <ion-label>Newcomer Assigned to Me</ion-label>
-        <ion-toggle item-end  (ionChange)="matchDb.updateNotifyAssigned(!matchDb.newcomerAssigned .getValue())" [ngModel]="matchDb.newcomerAssigned | async"></ion-toggle>
-    </ion-item>
+
     <ion-list-header color="light">Administration</ion-list-header>
     <ion-item>
       <ion-label color="primary" stacked>Superadmin Status</ion-label>
