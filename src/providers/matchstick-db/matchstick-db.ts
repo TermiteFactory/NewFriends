@@ -193,7 +193,7 @@ export class MatchstickDbProvider implements OnDestroy {
       if (profileUid!=null) {
         if (profileUid.community != "") {
           let permissionSub: Subscription = this.afd.object('/communitiesinfo/' + profileUid.community + '/permissions/').valueChanges().subscribe( (state) => {
-            if (state == null || state == 0 || !(profileUid.uid in state)) {
+            if (state!=null && (state == 0 || !(profileUid.uid in state))) {
               let permission = new Permission;
               let userdata = this.authData.authState.getValue();
               permission.email = userdata.email;
