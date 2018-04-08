@@ -161,18 +161,20 @@ export class MatchstickDbProvider implements OnDestroy {
               }
             });
             // For reach community that you are not a member of, please remove!
-            let properties = Object.getOwnPropertyNames(conf);
-            properties.forEach( prop => {
-              let found = false;
-              memberlist.forEach(mem => {
-                if (mem.community_id==prop && mem.membership=='Member') {
-                  found = true;
+            if (conf!=null || conf!=undefined) {
+              let properties = Object.getOwnPropertyNames(conf);
+              properties.forEach( prop => {
+                let found = false;
+                memberlist.forEach(mem => {
+                  if (mem.community_id==prop && mem.membership=='Member') {
+                    found = true;
+                  }
+                })
+                if (found==false) {
+                  this.afd.object<NotifyCommunityConf>('/notifications/' + profileuid.uid + '/configuration/' + prop).remove();
                 }
-              })
-              if (found==false) {
-                this.afd.object<NotifyCommunityConf>('/notifications/' + profileuid.uid + '/configuration/' + prop).remove();
-              }
-            }); 
+              }); 
+            }
             commNotSub.unsubscribe();
           });
         });
@@ -191,7 +193,7 @@ export class MatchstickDbProvider implements OnDestroy {
       if (profileUid!=null) {
         if (profileUid.community != "") {
           let permissionSub: Subscription = this.afd.object('/communitiesinfo/' + profileUid.community + '/permissions/').valueChanges().subscribe( (state) => {
-            if (state!=null && (state == 0 || !(profileUid.uid in state))) {
+            if (state == null || state == 0 || !(profileUid.uid in state)) {
               let permission = new Permission;
               let userdata = this.authData.authState.getValue();
               permission.email = userdata.email;

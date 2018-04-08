@@ -80,8 +80,8 @@ export class AuthProvider implements OnDestroy {
   loginUser(newEmail: string, newPassword: string): Promise<any> {
     return new Promise( (response, reject) => {
       this.afAuth.auth.signInWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
-        // hmm in the end there is nothing to do ...
-
+        this.storage.set('communityId', "");
+        this.communityId.next("");
         response(userdata);   
       }, (error) => reject(error));
     });
@@ -99,7 +99,8 @@ export class AuthProvider implements OnDestroy {
     return new Promise( (response, reject) => {
       this.afAuth.auth.createUserWithEmailAndPassword(newEmail, newPassword).then( (userdata) => {
         this.addProfileData(username);
-        this.storage.set('communityId', null);
+        this.storage.set('communityId', "");
+        this.communityId.next("");
         response(userdata);   
       }, (error) => reject(error));
     });
